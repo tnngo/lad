@@ -27,8 +27,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"go.uber.org/zap/buffer"
-	"go.uber.org/zap/internal/bufferpool"
+	"github.com/tnngo/lad/buffer"
+	"github.com/tnngo/lad/internal/bufferpool"
 )
 
 // For JSON-escaping; see jsonEncoder.safeAddString below.

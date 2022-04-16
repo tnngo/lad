@@ -21,9 +21,10 @@
 package zap
 
 import (
+	"context"
 	"fmt"
 
-	"go.uber.org/zap/zapcore"
+	"github.com/tnngo/lad/zapcore"
 )
 
 // An Option configures a Logger.
@@ -144,5 +145,11 @@ func OnFatal(action zapcore.CheckWriteAction) Option {
 func WithClock(clock zapcore.Clock) Option {
 	return optionFunc(func(log *Logger) {
 		log.clock = clock
+	})
+}
+
+func Context(contextFunc func(ctx context.Context) []Field) Option {
+	return optionFunc(func(log *Logger) {
+		log.contextFunc = contextFunc
 	})
 }

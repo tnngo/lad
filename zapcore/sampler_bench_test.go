@@ -26,9 +26,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/tnngo/lad/internal/ztest"
+	. "github.com/tnngo/lad/zapcore"
 	"go.uber.org/atomic"
-	"go.uber.org/zap/internal/ztest"
-	. "go.uber.org/zap/zapcore"
 )
 
 var counterTestCases = [][]string{

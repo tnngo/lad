@@ -21,9 +21,10 @@
 package zap
 
 import (
+	"context"
 	"fmt"
 
-	"go.uber.org/zap/zapcore"
+	"github.com/tnngo/lad/zapcore"
 
 	"go.uber.org/multierr"
 )
@@ -386,4 +387,8 @@ func (ps invalidPairs) MarshalLogArray(enc zapcore.ArrayEncoder) error {
 		err = multierr.Append(err, enc.AppendObject(ps[i]))
 	}
 	return err
+}
+
+func (s *SugaredLogger) Ctx(ctx context.Context) *SugaredLogger {
+	return &SugaredLogger{base: s.base.With(s.base.contextFunc(ctx)...)}
 }

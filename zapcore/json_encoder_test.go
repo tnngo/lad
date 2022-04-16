@@ -27,8 +27,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	zap "github.com/tnngo/lad"
+	"github.com/tnngo/lad/zapcore"
 )
 
 // TestJSONEncodeEntry is an more "integrated" test that makes it easier to get

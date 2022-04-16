@@ -23,8 +23,8 @@ package zapcore_test
 import (
 	"testing"
 
-	. "go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
+	. "github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/zaptest/observer"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -27,8 +27,8 @@ import (
 	"os"
 	"time"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	zap "github.com/tnngo/lad"
+	"github.com/tnngo/lad/zapcore"
 )
 
 func Example_presets() {

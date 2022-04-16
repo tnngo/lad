@@ -21,13 +21,14 @@
 package zap
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 
-	"go.uber.org/zap/internal/bufferpool"
-	"go.uber.org/zap/zapcore"
+	"github.com/tnngo/lad/internal/bufferpool"
+	"github.com/tnngo/lad/zapcore"
 )
 
 // A Logger provides fast, leveled, structured logging. All methods are safe
@@ -52,6 +53,8 @@ type Logger struct {
 	callerSkip int
 
 	clock zapcore.Clock
+
+	contextFunc func(ctx context.Context) []Field
 }
 
 // New constructs a new Logger from the provided zapcore.Core and Options. If
@@ -360,4 +363,15 @@ func (log *Logger) check(lvl zapcore.Level, msg string) *zapcore.CheckedEntry {
 	}
 
 	return ce
+}
+
+func (log *Logger) Ctx(ctx context.Context) *Logger {
+	if ctx != nil && log.contextFunc != nil {
+		l := log.clone()
+		contextFields := log.contextFunc(ctx)
+		l.core = l.core.With(contextFields)
+		return l
+	} else {
+		return log
+	}
 }

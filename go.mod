@@ -1,6 +1,6 @@
-module go.uber.org/zap
+module github.com/tnngo/lad
 
-go 1.18
+go 1.17
 
 require (
 	github.com/benbjohnson/clock v1.1.0

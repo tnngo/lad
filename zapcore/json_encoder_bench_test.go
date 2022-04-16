@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	. "go.uber.org/zap/zapcore"
+	. "github.com/tnngo/lad/zapcore"
 )
 
 func BenchmarkJSONLogMarshalerFunc(b *testing.B) {

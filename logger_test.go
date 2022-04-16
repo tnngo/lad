@@ -21,14 +21,15 @@
 package zap
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"testing"
 
-	"go.uber.org/zap/internal/exit"
-	"go.uber.org/zap/internal/ztest"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
+	"github.com/tnngo/lad/internal/exit"
+	"github.com/tnngo/lad/internal/ztest"
+	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/zaptest/observer"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -384,8 +385,8 @@ func TestLoggerAddCallerFunction(t *testing.T) {
 		},
 		{
 			options:         opts(AddCaller()),
-			loggerFunction:  "go.uber.org/zap.infoLog",
-			sugaredFunction: "go.uber.org/zap.infoLogSugared",
+			loggerFunction:  "github.com/tnngo/lad.infoLog",
+			sugaredFunction: "github.com/tnngo/lad.infoLogSugared",
 		},
 		{
 			options:         opts(AddCaller(), WithCaller(false)),
@@ -394,8 +395,8 @@ func TestLoggerAddCallerFunction(t *testing.T) {
 		},
 		{
 			options:         opts(WithCaller(true)),
-			loggerFunction:  "go.uber.org/zap.infoLog",
-			sugaredFunction: "go.uber.org/zap.infoLogSugared",
+			loggerFunction:  "github.com/tnngo/lad.infoLog",
+			sugaredFunction: "github.com/tnngo/lad.infoLogSugared",
 		},
 		{
 			options:         opts(WithCaller(true), WithCaller(false)),
@@ -404,13 +405,13 @@ func TestLoggerAddCallerFunction(t *testing.T) {
 		},
 		{
 			options:         opts(AddCaller(), AddCallerSkip(1), AddCallerSkip(-1)),
-			loggerFunction:  "go.uber.org/zap.infoLog",
-			sugaredFunction: "go.uber.org/zap.infoLogSugared",
+			loggerFunction:  "github.com/tnngo/lad.infoLog",
+			sugaredFunction: "github.com/tnngo/lad.infoLogSugared",
 		},
 		{
 			options:         opts(AddCaller(), AddCallerSkip(2)),
-			loggerFunction:  "go.uber.org/zap.withLogger",
-			sugaredFunction: "go.uber.org/zap.withLogger",
+			loggerFunction:  "github.com/tnngo/lad.withLogger",
+			sugaredFunction: "github.com/tnngo/lad.withLogger",
 		},
 		{
 			options:         opts(AddCaller(), AddCallerSkip(2), AddCallerSkip(3)),
@@ -606,4 +607,36 @@ func infoLog(logger *Logger, msg string, fields ...Field) {
 
 func infoLogSugared(logger *SugaredLogger, args ...interface{}) {
 	logger.Info(args...)
+}
+
+func TestLadContext(t *testing.T) {
+	type key string
+
+	const (
+		requestID key = "request_id"
+	)
+
+	t.Run("Context option use while logger create", func(t *testing.T) {
+		t.Run("Context is not nil", func(t *testing.T) {
+			defineContext := Context(func(ctx context.Context) []Field {
+				var fields []Field
+
+				if dc, ok := ctx.Value(requestID).(string); ok {
+					fields = append(fields, String(string(requestID), dc))
+				}
+
+				return fields
+			})
+			logger, _ := NewDevelopment(defineContext)
+
+			ctx := context.TODO()
+			ctx = context.WithValue(ctx, requestID, "123456789")
+
+			logMessage := "tnngo"
+
+			logger.Ctx(ctx).Info(logMessage)
+			logger.Ctx(ctx).Debug("1")
+			logger.Sugar().Ctx(ctx).Debug(2)
+		})
+	})
 }
