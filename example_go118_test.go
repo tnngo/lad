@@ -21,7 +21,7 @@
 //go:build go1.18
 // +build go1.18
 
-package zap_test
+package lad_test
 
 import "github.com/tnngo/lad"
 

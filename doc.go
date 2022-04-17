@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package zap provides fast, structured, leveled logging.
+// package lad provides fast, structured, leveled logging.
 //
 // For applications that log in the hot path, reflection-based serialization
 // and string formatting are prohibitively expensive - they're CPU-intensive
@@ -110,4 +110,4 @@
 //
 // An FAQ covering everything from installation errors to design decisions is
 // available at https://github.com/uber-go/zap/blob/master/FAQ.md.
-package zap // import "github.com/tnngo/lad"
+package lad // import "github.com/tnngo/lad"

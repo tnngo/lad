@@ -26,9 +26,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	zap "github.com/tnngo/lad"
 	. "github.com/tnngo/lad/zapcore"
 	"github.com/tnngo/lad/zaptest/observer"
-	"go.uber.org/zap"
 )
 
 func TestIncreaseLevel(t *testing.T) {
