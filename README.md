@@ -63,7 +63,7 @@ ctx = context.WithValue(ctx, requestID, "123456789")
 
 logMessage := "tnngo"
 
-logger.Ctx(ctx).Info(logMessage)
-logger.Ctx(ctx).Debug("1")
-logger.Sugar().Ctx(ctx).Debug(2)
+logger.WithContext(ctx).Info(logMessage)
+logger.WithContext(ctx).Debug("1")
+logger.Sugar().WithContext(ctx).Debug(2)
 ```
