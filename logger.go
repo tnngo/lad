@@ -365,7 +365,7 @@ func (log *Logger) check(lvl zapcore.Level, msg string) *zapcore.CheckedEntry {
 	return ce
 }
 
-func (log *Logger) Ctx(ctx context.Context) *Logger {
+func (log *Logger) WithContext(ctx context.Context) *Logger {
 	if ctx != nil && log.contextFunc != nil {
 		l := log.clone()
 		contextFields := log.contextFunc(ctx)

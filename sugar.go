@@ -389,6 +389,6 @@ func (ps invalidPairs) MarshalLogArray(enc zapcore.ArrayEncoder) error {
 	return err
 }
 
-func (s *SugaredLogger) Ctx(ctx context.Context) *SugaredLogger {
+func (s *SugaredLogger) WithContext(ctx context.Context) *SugaredLogger {
 	return &SugaredLogger{base: s.base.With(s.base.contextFunc(ctx)...)}
 }
