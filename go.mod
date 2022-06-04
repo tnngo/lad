@@ -1,6 +1,6 @@
 module github.com/tnngo/lad
 
-go 1.17
+go 1.18
 
 require (
 	github.com/benbjohnson/clock v1.1.0

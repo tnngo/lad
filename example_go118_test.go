@@ -26,13 +26,13 @@ package lad_test
 import "github.com/tnngo/lad"
 
 func ExampleObjects() {
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
 	// Use the Objects field constructor when you have a list of objects,
 	// all of which implement zapcore.ObjectMarshaler.
 	logger.Debug("opening connections",
-		zap.Objects("addrs", []addr{
+		lad.Objects("addrs", []addr{
 			{IP: "123.45.67.89", Port: 4040},
 			{IP: "127.0.0.1", Port: 4041},
 			{IP: "192.168.0.1", Port: 4042},
@@ -42,14 +42,14 @@ func ExampleObjects() {
 }
 
 func ExampleObjectValues() {
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
 	// Use the ObjectValues field constructor when you have a list of
 	// objects that do not implement zapcore.ObjectMarshaler directly,
 	// but on their pointer receivers.
 	logger.Debug("starting tunnels",
-		zap.ObjectValues("addrs", []request{
+		lad.ObjectValues("addrs", []request{
 			{
 				URL:    "/foo",
 				Listen: addr{"127.0.0.1", 8080},
