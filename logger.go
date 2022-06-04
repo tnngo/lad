@@ -23,7 +23,7 @@ package lad
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 
@@ -88,7 +88,7 @@ func New(core zapcore.Core, options ...Option) *Logger {
 func NewNop() *Logger {
 	return &Logger{
 		core:        zapcore.NewNopCore(),
-		errorOutput: zapcore.AddSync(ioutil.Discard),
+		errorOutput: zapcore.AddSync(io.Discard),
 		addStack:    zapcore.FatalLevel + 1,
 		clock:       zapcore.DefaultClock,
 	}
@@ -108,6 +108,19 @@ func NewProduction(options ...Option) (*Logger, error) {
 // It's a shortcut for NewDevelopmentConfig().Build(...Option).
 func NewDevelopment(options ...Option) (*Logger, error) {
 	return NewDevelopmentConfig().Build(options...)
+}
+
+// Must is a helper that wraps a call to a function returning (*Logger, error)
+// and panics if the error is non-nil. It is intended for use in variable
+// initialization such as:
+//
+//     var logger := zap.Must(zap.NewProduction())
+func Must(logger *Logger, err error) *Logger {
+	if err != nil {
+		panic(err)
+	}
+
+	return logger
 }
 
 // NewExample builds a Logger that's designed for use in zap's testable
@@ -291,9 +304,18 @@ func (log *Logger) check(lvl zapcore.Level, msg string) *zapcore.CheckedEntry {
 		ce = ce.Should(ent, zapcore.WriteThenPanic)
 	case zapcore.FatalLevel:
 		onFatal := log.onFatal
-		// nil is the default value for CheckWriteAction, and it leads to
-		// continued execution after a Fatal which is unexpected.
-		if onFatal == nil {
+		// nil or WriteThenNoop will lead to continued execution after
+		// a Fatal log entry, which is unexpected. For example,
+		//
+		//   f, err := os.Open(..)
+		//   if err != nil {
+		//     log.Fatal("cannot open", zap.Error(err))
+		//   }
+		//   fmt.Println(f.Name())
+		//
+		// The f.Name() will panic if we continue execution after the
+		// log.Fatal.
+		if onFatal == nil || onFatal == zapcore.WriteThenNoop {
 			onFatal = zapcore.WriteThenFatal
 		}
 		ce = ce.After(ent, onFatal)

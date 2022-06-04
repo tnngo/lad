@@ -23,7 +23,6 @@ package lad
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 
 	"github.com/tnngo/lad/zapcore"
 
@@ -93,7 +92,7 @@ func open(paths []string) ([]zapcore.WriteSyncer, func(), error) {
 // using zapcore.NewMultiWriteSyncer and zapcore.Lock individually.
 func CombineWriteSyncers(writers ...zapcore.WriteSyncer) zapcore.WriteSyncer {
 	if len(writers) == 0 {
-		return zapcore.AddSync(ioutil.Discard)
+		return zapcore.AddSync(io.Discard)
 	}
 	return zapcore.Lock(zapcore.NewMultiWriteSyncer(writers...))
 }
