@@ -28,7 +28,7 @@ import (
 	"github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/ladgrpc"
-	"github.com/tnngo/lad/zaptest/observer"
+	"github.com/tnngo/lad/ladtest/observer"
 	"google.golang.org/grpc/grpclog"
 )
 

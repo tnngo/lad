@@ -18,5 +18,5 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package zaptest provides a variety of helpers for testing log output.
-package zaptest // import "github.com/tnngo/lad/zaptest"
+// Package ladtest provides a variety of helpers for testing log output.
+package ladtest // import "github.com/tnngo/lad/ladtest"

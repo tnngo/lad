@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zaptest
+package ladtest
 
 import (
 	"errors"
@@ -96,11 +96,11 @@ func TestTestLoggerSupportsWrappedZapOptions(t *testing.T) {
 	}, "log.Panic should panic")
 
 	ts.AssertMessages(
-		`INFO	zaptest/logger_test.go:89	received work order	{"k1": "v1"}`,
-		`DEBUG	zaptest/logger_test.go:90	starting work	{"k1": "v1"}`,
-		`WARN	zaptest/logger_test.go:91	work may fail	{"k1": "v1"}`,
-		`ERROR	zaptest/logger_test.go:92	work failed	{"k1": "v1", "error": "great sadness"}`,
-		`PANIC	zaptest/logger_test.go:95	failed to do work	{"k1": "v1"}`,
+		`INFO	ladtest/logger_test.go:89	received work order	{"k1": "v1"}`,
+		`DEBUG	ladtest/logger_test.go:90	starting work	{"k1": "v1"}`,
+		`WARN	ladtest/logger_test.go:91	work may fail	{"k1": "v1"}`,
+		`ERROR	ladtest/logger_test.go:92	work failed	{"k1": "v1", "error": "great sadness"}`,
+		`PANIC	ladtest/logger_test.go:95	failed to do work	{"k1": "v1"}`,
 	)
 }
 

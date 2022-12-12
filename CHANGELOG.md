@@ -143,7 +143,7 @@ Enhancements:
 * [#949][]: Avoid panicking in `zap.SugaredLogger` when arguments of `*w`
   methods don't match expectations.
 * [#943][]: Add support for filtering by level or arbitrary matcher function to
-  `zaptest/observer`.
+  `ladtest/observer`.
 * [#691][]: Comply with `io.StringWriter` and `io.ByteWriter` in Zap's
   `buffer.Buffer`.
 
@@ -172,7 +172,7 @@ Enhancements:
   with the `application/x-www-form-urlencoded` content type.
 * [#912][]: Support multi-field encoding with `zap.Inline`.
 * [#913][]: Speed up SugaredLogger for calls with a single string.
-* [#928][]: Add support for filtering by field name to `zaptest/observer`.
+* [#928][]: Add support for filtering by field name to `ladtest/observer`.
 
 Thanks to @ash2k, @FMLS, @jimmystewpot, @Oncilla, @tsoslow, @tylitianrui, @withshubh, and @wziww for their contributions to this release.
 
@@ -264,7 +264,7 @@ Bugfixes:
 * [#706][]: Fix incorrect call depth to determine caller in Go 1.12.
 
 Enhancements:
-* [#610][]: Add `zaptest.WrapOptions` to wrap `zap.Option` for creating test
+* [#610][]: Add `ladtest.WrapOptions` to wrap `zap.Option` for creating test
   loggers.
 * [#675][]: Don't panic when encoding a String field.
 * [#704][]: Disable HTML escaping for JSON objects encoded using the
@@ -388,7 +388,7 @@ Bugfixes:
 
 Enhancements:
 
-* [#386][]: Add filtering helpers to zaptest's observing logger.
+* [#386][]: Add filtering helpers to ladtest's observing logger.
 
 Thanks to @moitias for contributing to this release.
 
@@ -404,7 +404,7 @@ Breaking changes:
   casting from `[]byte` to `string`.
 * [#364][]: To support buffering outputs, add `Sync` methods to `ladcore.Core`,
   `zap.Logger`, and `zap.SugaredLogger`.
-* [#371][]: Rename the `testutils` package to `zaptest`, which is less likely to
+* [#371][]: Rename the `testutils` package to `ladtest`, which is less likely to
   clash with other testing helpers.
 
 Bugfixes:
@@ -430,7 +430,7 @@ Enhancements:
   `WriteSyncer`s and lock the result.
 * [#365][]: Make zap's stacktraces compatible with mid-stack inlining (coming in
   Go 1.9).
-* [#372][]: Export zap's observing logger as `zaptest/observer`. This makes it
+* [#372][]: Export zap's observing logger as `ladtest/observer`. This makes it
   easier for particularly punctilious users to unit test their application's
   logging.
 

@@ -154,7 +154,7 @@ We're aware of the following extensions, but haven't used them ourselves:
 | Package | Integration |
 | --- | --- |
 | `github.com/tchap/zapext` | Sentry, syslog |
-| `github.com/fgrosse/zaptest` | Ginkgo |
+| `github.com/fgrosse/ladtest` | Ginkgo |
 | `github.com/blendle/zapdriver` | Stackdriver |
 | `github.com/moul/zapgorm` | Gorm |
 | `github.com/moul/zapfilter` | Advanced filtering rules |

@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zaptest
+package ladtest
 
 // TestingT is a subset of the API provided by all *testing.T and *testing.B
 // objects.

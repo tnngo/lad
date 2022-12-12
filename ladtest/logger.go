@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zaptest
+package ladtest
 
 import (
 	"bytes"
@@ -61,19 +61,19 @@ func WrapOptions(zapOpts ...zap.Option) LoggerOption {
 // NewLogger builds a new Logger that logs all messages to the given
 // testing.TB.
 //
-//	logger := zaptest.NewLogger(t)
+//	logger := ladtest.NewLogger(t)
 //
 // Use this with a *testing.T or *testing.B to get logs which get printed only
 // if a test fails or if you ran go test -v.
 //
 // The returned logger defaults to logging debug level messages and above.
-// This may be changed by passing a zaptest.Level during construction.
+// This may be changed by passing a ladtest.Level during construction.
 //
-//	logger := zaptest.NewLogger(t, zaptest.Level(zap.WarnLevel))
+//	logger := ladtest.NewLogger(t, ladtest.Level(zap.WarnLevel))
 //
 // You may also pass zap.Option's to customize test logger.
 //
-//	logger := zaptest.NewLogger(t, zaptest.WrapOptions(zap.AddCaller()))
+//	logger := ladtest.NewLogger(t, ladtest.WrapOptions(zap.AddCaller()))
 func NewLogger(t TestingT, opts ...LoggerOption) *zap.Logger {
 	cfg := loggerOptions{
 		Level: ladcore.DebugLevel,

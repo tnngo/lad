@@ -18,12 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zaptest
+package ladtest
 
 import "testing"
 
 // Just a compile-time test to ensure that TestingT matches the testing.TB
 // interface. We could do this in testingt.go but that would put a dependency
-// on the "testing" package from zaptest.
+// on the "testing" package from ladtest.
 
 var _ TestingT = (testing.TB)(nil)
