@@ -3,7 +3,8 @@ module github.com/tnngo/lad/ladgrpc/internal/test
 go 1.17
 
 require (
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.8.0
+	github.com/tnngo/lad v0.0.0-00010101000000-000000000000
 	google.golang.org/grpc v1.42.0
 )
 
