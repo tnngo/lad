@@ -18,8 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package zapgrpc provides a logger that is compatible with grpclog.
-package zapgrpc // import "github.com/tnngo/lad/zapgrpc"
+// Package ladgrpc provides a logger that is compatible with grpclog.
+package ladgrpc // import "github.com/tnngo/lad/ladgrpc"
 
 import (
 	"fmt"

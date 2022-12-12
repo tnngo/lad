@@ -25,7 +25,7 @@ import (
 	"testing"
 
 	"github.com/tnngo/lad/ladcore"
-	"github.com/tnngo/lad/zaptest/observer"
+	"github.com/tnngo/lad/ladtest/observer"
 )
 
 func opts(opts ...Option) []Option {

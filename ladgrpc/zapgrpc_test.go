@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapgrpc
+package ladgrpc
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ import (
 
 	zap "github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
-	"github.com/tnngo/lad/zaptest/observer"
+	"github.com/tnngo/lad/ladtest/observer"
 
 	"github.com/stretchr/testify/require"
 )

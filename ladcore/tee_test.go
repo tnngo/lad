@@ -26,7 +26,7 @@ import (
 
 	"github.com/tnngo/lad/internal/ztest"
 	. "github.com/tnngo/lad/ladcore"
-	"github.com/tnngo/lad/zaptest/observer"
+	"github.com/tnngo/lad/ladtest/observer"
 
 	"github.com/stretchr/testify/assert"
 )

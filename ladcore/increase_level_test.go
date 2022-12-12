@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 	zap "github.com/tnngo/lad"
 	. "github.com/tnngo/lad/ladcore"
-	"github.com/tnngo/lad/zaptest/observer"
+	"github.com/tnngo/lad/ladtest/observer"
 )
 
 func TestIncreaseLevel(t *testing.T) {

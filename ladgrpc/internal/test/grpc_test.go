@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
-	"github.com/tnngo/lad/zapgrpc"
+	"github.com/tnngo/lad/ladgrpc"
 	"github.com/tnngo/lad/zaptest/observer"
 	"google.golang.org/grpc/grpclog"
 )
@@ -36,7 +36,7 @@ func TestLoggerV2(t *testing.T) {
 	core, observedLogs := observer.New(ladcore.InfoLevel)
 	zlog := zap.New(core)
 
-	grpclog.SetLoggerV2(zapgrpc.NewLogger(zlog))
+	grpclog.SetLoggerV2(ladgrpc.NewLogger(zlog))
 
 	grpclog.Info("hello from grpc")
 

@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tnngo/lad/ladcore"
-	"github.com/tnngo/lad/zaptest/observer"
+	"github.com/tnngo/lad/ladtest/observer"
 )
 
 func newLoggedEntry(level ladcore.Level, msg string, fields ...ladcore.Field) observer.LoggedEntry {

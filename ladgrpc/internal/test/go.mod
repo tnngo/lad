@@ -1,4 +1,4 @@
-module github.com/tnngo/lad/zapgrpc/internal/test
+module github.com/tnngo/lad/ladgrpc/internal/test
 
 go 1.17
 

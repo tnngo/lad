@@ -167,7 +167,7 @@ Bugfixes:
 Enhancements:
 * [#865][]: Improve alignment of fields of the Logger struct, reducing its
   size from 96 to 80 bytes.
-* [#881][]: Support `grpclog.LoggerV2` in zapgrpc.
+* [#881][]: Support `grpclog.LoggerV2` in ladgrpc.
 * [#903][]: Support URL-encoded POST requests to the AtomicLevel HTTP handler
   with the `application/x-www-form-urlencoded` content type.
 * [#912][]: Support multi-field encoding with `zap.Inline`.
@@ -372,7 +372,7 @@ This release adds a gRPC compatibility wrapper. It is fully backward-compatible.
 
 Enhancements:
 
-* [#402][]: Add a `zapgrpc` package that wraps zap's Logger and implements
+* [#402][]: Add a `ladgrpc` package that wraps zap's Logger and implements
   `grpclog.Logger`.
 
 ## v1.1.0 (31 Mar 2017)

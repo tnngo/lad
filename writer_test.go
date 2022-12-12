@@ -31,12 +31,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-<<<<<<< HEAD
 	"github.com/tnngo/lad/ladcore"
-=======
 	"go.uber.org/multierr"
-	"go.uber.org/zap/ladcore"
->>>>>>> upstream/master
 )
 
 func TestOpenNoPaths(t *testing.T) {
