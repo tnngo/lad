@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/stretchr/testify v1.7.0
-	github.com/tnngo/lad v1.16.0
 	google.golang.org/grpc v1.42.0
 )
 

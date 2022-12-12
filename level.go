@@ -23,6 +23,11 @@ package lad
 import (
 	"github.com/tnngo/lad/zapcore"
 	"go.uber.org/atomic"
+<<<<<<< HEAD
+=======
+	"go.uber.org/zap/internal"
+	"go.uber.org/zap/zapcore"
+>>>>>>> upstream/master
 )
 
 const (
@@ -69,6 +74,8 @@ func (f LevelEnablerFunc) Enabled(lvl zapcore.Level) bool { return f(lvl) }
 type AtomicLevel struct {
 	l *atomic.Int32
 }
+
+var _ internal.LeveledEnabler = AtomicLevel{}
 
 // NewAtomicLevel creates an AtomicLevel with InfoLevel and above logging
 // enabled.

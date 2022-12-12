@@ -114,7 +114,7 @@ func NewDevelopment(options ...Option) (*Logger, error) {
 // and panics if the error is non-nil. It is intended for use in variable
 // initialization such as:
 //
-//     var logger := zap.Must(zap.NewProduction())
+//	var logger = zap.Must(zap.NewProduction())
 func Must(logger *Logger, err error) *Logger {
 	if err != nil {
 		panic(err)
@@ -186,11 +186,26 @@ func (log *Logger) With(fields ...Field) *Logger {
 	return l
 }
 
+// Level reports the minimum enabled level for this logger.
+//
+// For NopLoggers, this is [zapcore.InvalidLevel].
+func (log *Logger) Level() zapcore.Level {
+	return zapcore.LevelOf(log.core)
+}
+
 // Check returns a CheckedEntry if logging a message at the specified level
 // is enabled. It's a completely optional optimization; in high-performance
 // applications, Check can help avoid allocating a slice to hold fields.
 func (log *Logger) Check(lvl zapcore.Level, msg string) *zapcore.CheckedEntry {
 	return log.check(lvl, msg)
+}
+
+// Log logs a message at the specified level. The message includes any fields
+// passed at the log site, as well as any fields accumulated on the logger.
+func (log *Logger) Log(lvl zapcore.Level, msg string, fields ...Field) {
+	if ce := log.check(lvl, msg); ce != nil {
+		ce.Write(fields...)
+	}
 }
 
 // Debug logs a message at DebugLevel. The message includes any fields passed
@@ -301,7 +316,7 @@ func (log *Logger) check(lvl zapcore.Level, msg string) *zapcore.CheckedEntry {
 	// Set up any required terminal behavior.
 	switch ent.Level {
 	case zapcore.PanicLevel:
-		ce = ce.Should(ent, zapcore.WriteThenPanic)
+		ce = ce.After(ent, zapcore.WriteThenPanic)
 	case zapcore.FatalLevel:
 		onFatal := log.onFatal
 		// nil or WriteThenNoop will lead to continued execution after
@@ -321,7 +336,7 @@ func (log *Logger) check(lvl zapcore.Level, msg string) *zapcore.CheckedEntry {
 		ce = ce.After(ent, onFatal)
 	case zapcore.DPanicLevel:
 		if log.development {
-			ce = ce.Should(ent, zapcore.WriteThenPanic)
+			ce = ce.After(ent, zapcore.WriteThenPanic)
 		}
 	}
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Uber Technologies, Inc.
+// Copyright (c) 2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,31 +18,54 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package exit_test
+//go:build windows
+
+package zap
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tnngo/lad/internal/exit"
 )
 
-func TestStub(t *testing.T) {
-	type want struct {
-		exit bool
-		code int
-	}
+func TestWindowsPaths(t *testing.T) {
+	// See https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats
 	tests := []struct {
-		f    func()
-		want want
+		msg  string
+		path string
 	}{
-		{func() { exit.With(42) }, want{exit: true, code: 42}},
-		{func() {}, want{}},
+		{
+			msg:  "local path with drive",
+			path: `c:\log.json`,
+		},
+		{
+			msg:  "local path with drive using forward slash",
+			path: `c:/log.json`,
+		},
+		{
+			msg:  "local path without drive",
+			path: `\Temp\log.json`,
+		},
+		{
+			msg:  "unc path",
+			path: `\\Server2\Logs\log.json`,
+		},
 	}
 
 	for _, tt := range tests {
-		s := exit.WithStub(tt.f)
-		assert.Equal(t, tt.want.exit, s.Exited, "Stub captured unexpected exit value.")
-		assert.Equal(t, tt.want.code, s.Code, "Stub captured unexpected exit value.")
+		t.Run(tt.msg, func(t *testing.T) {
+			sr := newSinkRegistry()
+
+			openFilename := "<not called>"
+			sr.openFile = func(filename string, _ int, _ os.FileMode) (*os.File, error) {
+				openFilename = filename
+				return nil, assert.AnError
+			}
+
+			_, err := sr.newSink(tt.path)
+			assert.Equal(t, assert.AnError, err, "expect stub error from OpenFile")
+			assert.Equal(t, tt.path, openFilename, "unexpected path opened")
+		})
 	}
 }

@@ -21,6 +21,7 @@
 package lad
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/tnngo/lad/internal/exit"
@@ -44,6 +45,12 @@ func TestSugarWith(t *testing.T) {
 		return observer.LoggedEntry{
 			Entry:   zapcore.Entry{Level: ErrorLevel, Message: _nonStringKeyErrMsg},
 			Context: []Field{Array("invalid", invalidPairs(pairs))},
+		}
+	}
+	ignoredError := func(err error) observer.LoggedEntry {
+		return observer.LoggedEntry{
+			Entry:   zapcore.Entry{Level: ErrorLevel, Message: _multipleErrMsg},
+			Context: []Field{Error(err)},
 		}
 	}
 
@@ -122,6 +129,15 @@ func TestSugarWith(t *testing.T) {
 				nonString(invalidPair{2, true, "bar"}, invalidPair{5, 42, "reversed"}),
 			},
 		},
+		{
+			desc:     "multiple errors",
+			args:     []interface{}{errors.New("first"), errors.New("second"), errors.New("third")},
+			expected: []Field{Error(errors.New("first"))},
+			errLogs: []observer.LoggedEntry{
+				ignoredError(errors.New("second")),
+				ignoredError(errors.New("third")),
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -137,6 +153,35 @@ func TestSugarWith(t *testing.T) {
 			assert.Equal(t, tt.expected, output[len(tt.errLogs)].Context, "Unexpected message context in scenario %s.", tt.desc)
 		})
 	}
+}
+
+func TestSugaredLoggerLevel(t *testing.T) {
+	levels := []zapcore.Level{
+		DebugLevel,
+		InfoLevel,
+		WarnLevel,
+		ErrorLevel,
+		DPanicLevel,
+		PanicLevel,
+		FatalLevel,
+	}
+
+	for _, lvl := range levels {
+		lvl := lvl
+		t.Run(lvl.String(), func(t *testing.T) {
+			t.Parallel()
+
+			core, _ := observer.New(lvl)
+			log := New(core).Sugar()
+			assert.Equal(t, lvl, log.Level())
+		})
+	}
+
+	t.Run("Nop", func(t *testing.T) {
+		t.Parallel()
+
+		assert.Equal(t, zapcore.InvalidLevel, NewNop().Sugar().Level())
+	})
 }
 
 func TestSugarFieldsInvalidPairs(t *testing.T) {
@@ -169,9 +214,12 @@ func TestSugarStructuredLogging(t *testing.T) {
 	}
 
 	// Common to all test cases.
-	context := []interface{}{"foo", "bar"}
-	extra := []interface{}{"baz", false}
-	expectedFields := []Field{String("foo", "bar"), Bool("baz", false)}
+	var (
+		err            = errors.New("qux")
+		context        = []interface{}{"foo", "bar"}
+		extra          = []interface{}{err, "baz", false}
+		expectedFields = []Field{String("foo", "bar"), Error(err), Bool("baz", false)}
+	)
 
 	for _, tt := range tests {
 		withSugar(t, DebugLevel, nil, func(logger *SugaredLogger, logs *observer.ObservedLogs) {
