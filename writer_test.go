@@ -32,10 +32,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 <<<<<<< HEAD
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 =======
 	"go.uber.org/multierr"
-	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/ladcore"
 >>>>>>> upstream/master
 )
 
@@ -46,7 +46,7 @@ func TestOpenNoPaths(t *testing.T) {
 	assert.NoError(t, err, "Expected opening no paths to succeed.")
 	assert.Equal(
 		t,
-		zapcore.AddSync(io.Discard),
+		ladcore.AddSync(io.Discard),
 		ws,
 		"Expected opening no paths to return a no-op WriteSyncer.",
 	)

@@ -24,7 +24,7 @@ import (
 	"testing"
 
 	zap "github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -32,7 +32,7 @@ import (
 func TestLoggedEntryContextMap(t *testing.T) {
 	tests := []struct {
 		msg    string
-		fields []zapcore.Field
+		fields []ladcore.Field
 		want   map[string]interface{}
 	}{
 		{
@@ -42,7 +42,7 @@ func TestLoggedEntryContextMap(t *testing.T) {
 		},
 		{
 			msg: "simple",
-			fields: []zapcore.Field{
+			fields: []ladcore.Field{
 				zap.String("k1", "v"),
 				zap.Int64("k2", 10),
 			},
@@ -53,7 +53,7 @@ func TestLoggedEntryContextMap(t *testing.T) {
 		},
 		{
 			msg: "overwrite",
-			fields: []zapcore.Field{
+			fields: []ladcore.Field{
 				zap.String("k1", "v1"),
 				zap.String("k1", "v2"),
 			},
@@ -63,7 +63,7 @@ func TestLoggedEntryContextMap(t *testing.T) {
 		},
 		{
 			msg: "nested",
-			fields: []zapcore.Field{
+			fields: []ladcore.Field{
 				zap.String("k1", "v1"),
 				zap.Namespace("nested"),
 				zap.String("k2", "v2"),

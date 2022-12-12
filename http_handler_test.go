@@ -28,7 +28,7 @@ import (
 	"testing"
 
 	zap "github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,7 +42,7 @@ func TestAtomicLevelServeHTTP(t *testing.T) {
 		contentType   string
 		body          string
 		expectedCode  int
-		expectedLevel zapcore.Level
+		expectedLevel ladcore.Level
 	}{
 		{
 			desc:          "GET",
@@ -154,7 +154,7 @@ func TestAtomicLevelServeHTTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			lvl := zap.NewAtomicLevel()
-			lvl.SetLevel(zapcore.InfoLevel)
+			lvl.SetLevel(ladcore.InfoLevel)
 
 			server := httptest.NewServer(lvl)
 			defer server.Close()
@@ -181,7 +181,7 @@ func TestAtomicLevelServeHTTP(t *testing.T) {
 			}
 
 			var pld struct {
-				Level zapcore.Level `json:"level"`
+				Level ladcore.Level `json:"level"`
 			}
 			require.NoError(t, json.NewDecoder(res.Body).Decode(&pld), "Decoding response body")
 			assert.Equal(t, tt.expectedLevel, pld.Level, "Unexpected logging level returned")

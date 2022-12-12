@@ -27,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 	"go.uber.org/atomic"
 )
 
@@ -123,9 +123,9 @@ func TestConfigWithMissingAttributes(t *testing.T) {
 		{
 			desc: "missing encoder time in encoder config",
 			cfg: Config{
-				Level:    NewAtomicLevelAt(zapcore.InfoLevel),
+				Level:    NewAtomicLevelAt(ladcore.InfoLevel),
 				Encoding: "json",
-				EncoderConfig: zapcore.EncoderConfig{
+				EncoderConfig: ladcore.EncoderConfig{
 					MessageKey: "msg",
 					TimeKey:    "ts",
 				},
@@ -143,14 +143,14 @@ func TestConfigWithMissingAttributes(t *testing.T) {
 	}
 }
 
-func makeSamplerCountingHook() (h func(zapcore.Entry, zapcore.SamplingDecision),
+func makeSamplerCountingHook() (h func(ladcore.Entry, ladcore.SamplingDecision),
 	dropped, sampled *atomic.Int64) {
 	dropped = new(atomic.Int64)
 	sampled = new(atomic.Int64)
-	h = func(_ zapcore.Entry, dec zapcore.SamplingDecision) {
-		if dec&zapcore.LogDropped > 0 {
+	h = func(_ ladcore.Entry, dec ladcore.SamplingDecision) {
+		if dec&ladcore.LogDropped > 0 {
 			dropped.Inc()
-		} else if dec&zapcore.LogSampled > 0 {
+		} else if dec&ladcore.LogSampled > 0 {
 			sampled.Inc()
 		}
 	}

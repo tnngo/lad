@@ -20,16 +20,16 @@
 
 package internal
 
-import "go.uber.org/zap/zapcore"
+import "github.com/tnngo/lad/ladcore"
 
 // LeveledEnabler is an interface satisfied by LevelEnablers that are able to
 // report their own level.
 //
-// This interface is defined to use more conveniently in tests and non-zapcore
+// This interface is defined to use more conveniently in tests and non-ladcore
 // packages.
-// This cannot be imported from zapcore because of the cyclic dependency.
+// This cannot be imported from ladcore because of the cyclic dependency.
 type LeveledEnabler interface {
-	zapcore.LevelEnabler
+	ladcore.LevelEnabler
 
-	Level() zapcore.Level
+	Level() ladcore.Level
 }

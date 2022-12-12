@@ -26,13 +26,13 @@ package lad
 import (
 	"fmt"
 
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 // Objects constructs a field with the given key, holding a list of the
 // provided objects that can be marshaled by Zap.
 //
-// Note that these objects must implement zapcore.ObjectMarshaler directly.
+// Note that these objects must implement ladcore.ObjectMarshaler directly.
 // That is, if you're trying to marshal a []Request, the MarshalLogObject
 // method must be declared on the Request type, not its pointer (*Request).
 // If it's on the pointer, use ObjectValues.
@@ -41,7 +41,7 @@ import (
 // can log a slice of those objects with Objects like so:
 //
 //	type Author struct{ ... }
-//	func (a Author) MarshalLogObject(enc zapcore.ObjectEncoder) error
+//	func (a Author) MarshalLogObject(enc ladcore.ObjectEncoder) error
 //
 //	var authors []Author = ...
 //	logger.Info("loading article", zap.Objects("authors", authors))
@@ -51,7 +51,7 @@ import (
 // so:
 //
 //	type Request struct{ ... }
-//	func (r *Request) MarshalLogObject(enc zapcore.ObjectEncoder) error
+//	func (r *Request) MarshalLogObject(enc ladcore.ObjectEncoder) error
 //
 //	var requests []*Request = ...
 //	logger.Info("sending requests", zap.Objects("requests", requests))
@@ -61,13 +61,13 @@ import (
 //
 //	var requests []Request = ...
 //	logger.Info("sending requests", zap.ObjectValues("requests", requests))
-func Objects[T zapcore.ObjectMarshaler](key string, values []T) Field {
+func Objects[T ladcore.ObjectMarshaler](key string, values []T) Field {
 	return Array(key, objects[T](values))
 }
 
-type objects[T zapcore.ObjectMarshaler] []T
+type objects[T ladcore.ObjectMarshaler] []T
 
-func (os objects[T]) MarshalLogArray(arr zapcore.ArrayEncoder) error {
+func (os objects[T]) MarshalLogArray(arr ladcore.ArrayEncoder) error {
 	for _, o := range os {
 		if err := arr.AppendObject(o); err != nil {
 			return err
@@ -77,16 +77,16 @@ func (os objects[T]) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 }
 
 // ObjectMarshalerPtr is a constraint that specifies that the given type
-// implements zapcore.ObjectMarshaler on a pointer receiver.
+// implements ladcore.ObjectMarshaler on a pointer receiver.
 type ObjectMarshalerPtr[T any] interface {
 	*T
-	zapcore.ObjectMarshaler
+	ladcore.ObjectMarshaler
 }
 
 // ObjectValues constructs a field with the given key, holding a list of the
 // provided objects, where pointers to these objects can be marshaled by Zap.
 //
-// Note that pointers to these objects must implement zapcore.ObjectMarshaler.
+// Note that pointers to these objects must implement ladcore.ObjectMarshaler.
 // That is, if you're trying to marshal a []Request, the MarshalLogObject
 // method must be declared on the *Request type, not the value (Request).
 // If it's on the value, use Objects.
@@ -95,7 +95,7 @@ type ObjectMarshalerPtr[T any] interface {
 // you can log a slice of those objects with ObjectValues like so:
 //
 //	type Request struct{ ... }
-//	func (r *Request) MarshalLogObject(enc zapcore.ObjectEncoder) error
+//	func (r *Request) MarshalLogObject(enc ladcore.ObjectEncoder) error
 //
 //	var requests []Request = ...
 //	logger.Info("sending requests", zap.ObjectValues("requests", requests))
@@ -111,7 +111,7 @@ func ObjectValues[T any, P ObjectMarshalerPtr[T]](key string, values []T) Field 
 
 type objectValues[T any, P ObjectMarshalerPtr[T]] []T
 
-func (os objectValues[T, P]) MarshalLogArray(arr zapcore.ArrayEncoder) error {
+func (os objectValues[T, P]) MarshalLogArray(arr ladcore.ArrayEncoder) error {
 	for i := range os {
 		// It is necessary for us to explicitly reference the "P" type.
 		// We cannot simply pass "&os[i]" to AppendObject because its type
@@ -148,7 +148,7 @@ func Stringers[T fmt.Stringer](key string, values []T) Field {
 
 type stringers[T fmt.Stringer] []T
 
-func (os stringers[T]) MarshalLogArray(arr zapcore.ArrayEncoder) error {
+func (os stringers[T]) MarshalLogArray(arr ladcore.ArrayEncoder) error {
 	for _, o := range os {
 		arr.AppendString(o.String())
 	}

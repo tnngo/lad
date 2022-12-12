@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore
+package ladcore
 
 import (
 	"bytes"
@@ -93,7 +93,7 @@ type leveledEnabler interface {
 // LevelOf to retrieve the level of the wrapped core. For example,
 //
 //	func (c *coreWrapper) Level() Level {
-//		return zapcore.LevelOf(c.wrappedCore)
+//		return ladcore.LevelOf(c.wrappedCore)
 //	}
 func LevelOf(enab LevelEnabler) Level {
 	if lvler, ok := enab.(leveledEnabler); ok {

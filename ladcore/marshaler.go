@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore
+package ladcore
 
 // ObjectMarshaler allows user-defined types to efficiently add themselves to the
 // logging context, and to selectively omit information which shouldn't be

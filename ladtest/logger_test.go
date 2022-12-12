@@ -29,7 +29,7 @@ import (
 
 	zap "github.com/tnngo/lad"
 	"github.com/tnngo/lad/internal/ztest"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -123,11 +123,11 @@ func TestTestLoggerErrorOutput(t *testing.T) {
 	log := NewLogger(ts)
 
 	// Replace with a core that fails.
-	log = log.WithOptions(zap.WrapCore(func(zapcore.Core) zapcore.Core {
-		return zapcore.NewCore(
-			zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
-			zapcore.Lock(zapcore.AddSync(ztest.FailWriter{})),
-			zapcore.DebugLevel,
+	log = log.WithOptions(zap.WrapCore(func(ladcore.Core) ladcore.Core {
+		return ladcore.NewCore(
+			ladcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
+			ladcore.Lock(ladcore.AddSync(ztest.FailWriter{})),
+			ladcore.DebugLevel,
 		)
 	}))
 

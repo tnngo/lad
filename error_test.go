@@ -24,7 +24,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 
 	richErrors "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -40,9 +40,9 @@ func TestErrorConstructors(t *testing.T) {
 		expect Field
 	}{
 		{"Error", Skip(), Error(nil)},
-		{"Error", Field{Key: "error", Type: zapcore.ErrorType, Interface: fail}, Error(fail)},
+		{"Error", Field{Key: "error", Type: ladcore.ErrorType, Interface: fail}, Error(fail)},
 		{"NamedError", Skip(), NamedError("foo", nil)},
-		{"NamedError", Field{Key: "foo", Type: zapcore.ErrorType, Interface: fail}, NamedError("foo", fail)},
+		{"NamedError", Field{Key: "foo", Type: ladcore.ErrorType, Interface: fail}, NamedError("foo", fail)},
 		{"Any:Error", Any("k", errors.New("v")), NamedError("k", errors.New("v"))},
 		{"Any:Errors", Any("k", []error{errors.New("v")}), Errors("k", []error{errors.New("v")})},
 	}
@@ -70,7 +70,7 @@ func TestErrorArrayConstructor(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		enc := zapcore.NewMapObjectEncoder()
+		enc := ladcore.NewMapObjectEncoder()
 		tt.field.Key = "k"
 		tt.field.AddTo(enc)
 		assert.Equal(t, tt.expected, enc.Fields["k"], "%s: unexpected map contents.", tt.desc)
@@ -81,7 +81,7 @@ func TestErrorArrayConstructor(t *testing.T) {
 func TestErrorsArraysHandleRichErrors(t *testing.T) {
 	errs := []error{richErrors.New("egad")}
 
-	enc := zapcore.NewMapObjectEncoder()
+	enc := ladcore.NewMapObjectEncoder()
 	Errors("k", errs).AddTo(enc)
 	assert.Equal(t, 1, len(enc.Fields), "Expected only top-level field.")
 

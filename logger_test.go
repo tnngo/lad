@@ -28,7 +28,7 @@ import (
 
 	"github.com/tnngo/lad/internal/exit"
 	"github.com/tnngo/lad/internal/ztest"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/zaptest/observer"
 
 	"github.com/stretchr/testify/assert"
@@ -36,9 +36,9 @@ import (
 	"go.uber.org/atomic"
 )
 
-func makeCountingHook() (func(zapcore.Entry) error, *atomic.Int64) {
+func makeCountingHook() (func(ladcore.Entry) error, *atomic.Int64) {
 	count := &atomic.Int64{}
-	h := func(zapcore.Entry) error {
+	h := func(ladcore.Entry) error {
 		count.Inc()
 		return nil
 	}
@@ -54,8 +54,8 @@ func TestLoggerAtomicLevel(t *testing.T) {
 		child := parent.With(Int("generation", 2))
 
 		tests := []struct {
-			setLevel  zapcore.Level
-			testLevel zapcore.Level
+			setLevel  ladcore.Level
+			testLevel ladcore.Level
 			enabled   bool
 		}{
 			{DebugLevel, DebugLevel, true},
@@ -85,7 +85,7 @@ func TestLoggerAtomicLevel(t *testing.T) {
 }
 
 func TestLoggerLevel(t *testing.T) {
-	levels := []zapcore.Level{
+	levels := []ladcore.Level{
 		DebugLevel,
 		InfoLevel,
 		WarnLevel,
@@ -107,7 +107,7 @@ func TestLoggerLevel(t *testing.T) {
 	}
 
 	t.Run("Nop", func(t *testing.T) {
-		assert.Equal(t, zapcore.InvalidLevel, NewNop().Level())
+		assert.Equal(t, ladcore.InvalidLevel, NewNop().Level())
 	})
 }
 
@@ -163,7 +163,7 @@ func TestLoggerLogPanic(t *testing.T) {
 			assert.Equal(t, 0, len(output[0].Context), "Unexpected context on first log.")
 			assert.Equal(
 				t,
-				zapcore.Entry{Message: tt.expected, Level: PanicLevel},
+				ladcore.Entry{Message: tt.expected, Level: PanicLevel},
 				output[0].Entry,
 				"Unexpected output from panic-level Log.",
 			)
@@ -190,7 +190,7 @@ func TestLoggerLogFatal(t *testing.T) {
 			assert.Equal(t, 0, len(output[0].Context), "Unexpected context on first log.")
 			assert.Equal(
 				t,
-				zapcore.Entry{Message: tt.expected, Level: FatalLevel},
+				ladcore.Entry{Message: tt.expected, Level: FatalLevel},
 				output[0].Entry,
 				"Unexpected output from fatal-level Log.",
 			)
@@ -202,7 +202,7 @@ func TestLoggerLeveledMethods(t *testing.T) {
 	withLogger(t, DebugLevel, nil, func(logger *Logger, logs *observer.ObservedLogs) {
 		tests := []struct {
 			method        func(string, ...Field)
-			expectedLevel zapcore.Level
+			expectedLevel ladcore.Level
 		}{
 			{logger.Debug, DebugLevel},
 			{logger.Info, InfoLevel},
@@ -217,7 +217,7 @@ func TestLoggerLeveledMethods(t *testing.T) {
 			assert.Equal(t, 0, len(output[i].Context), "Unexpected context on first log.")
 			assert.Equal(
 				t,
-				zapcore.Entry{Level: tt.expectedLevel},
+				ladcore.Entry{Level: tt.expectedLevel},
 				output[i].Entry,
 				"Unexpected output from %s-level logger method.", tt.expectedLevel)
 		}
@@ -226,7 +226,7 @@ func TestLoggerLeveledMethods(t *testing.T) {
 
 func TestLoggerLogLevels(t *testing.T) {
 	withLogger(t, DebugLevel, nil, func(logger *Logger, logs *observer.ObservedLogs) {
-		levels := []zapcore.Level{
+		levels := []ladcore.Level{
 			DebugLevel,
 			InfoLevel,
 			WarnLevel,
@@ -240,7 +240,7 @@ func TestLoggerLogLevels(t *testing.T) {
 			assert.Equal(t, 0, len(output[i].Context), "Unexpected context on first log.")
 			assert.Equal(
 				t,
-				zapcore.Entry{Level: level},
+				ladcore.Entry{Level: level},
 				output[i].Entry,
 				"Unexpected output from %s-level logger method.", level)
 		}
@@ -289,7 +289,7 @@ func TestLoggerDPanic(t *testing.T) {
 		assert.NotPanics(t, func() { logger.DPanic("") })
 		assert.Equal(
 			t,
-			[]observer.LoggedEntry{{Entry: zapcore.Entry{Level: DPanicLevel}, Context: []Field{}}},
+			[]observer.LoggedEntry{{Entry: ladcore.Entry{Level: DPanicLevel}, Context: []Field{}}},
 			logs.AllUntimed(),
 			"Unexpected log output from DPanic in production mode.",
 		)
@@ -298,7 +298,7 @@ func TestLoggerDPanic(t *testing.T) {
 		assert.Panics(t, func() { logger.DPanic("") })
 		assert.Equal(
 			t,
-			[]observer.LoggedEntry{{Entry: zapcore.Entry{Level: DPanicLevel}, Context: []Field{}}},
+			[]observer.LoggedEntry{{Entry: ladcore.Entry{Level: DPanicLevel}, Context: []Field{}}},
 			logs.AllUntimed(),
 			"Unexpected log output from DPanic in development mode.",
 		)
@@ -357,9 +357,9 @@ func TestLoggerNames(t *testing.T) {
 func TestLoggerWriteFailure(t *testing.T) {
 	errSink := &ztest.Buffer{}
 	logger := New(
-		zapcore.NewCore(
-			zapcore.NewJSONEncoder(NewProductionConfig().EncoderConfig),
-			zapcore.Lock(zapcore.AddSync(ztest.FailWriter{})),
+		ladcore.NewCore(
+			ladcore.NewJSONEncoder(NewProductionConfig().EncoderConfig),
+			ladcore.Lock(ladcore.AddSync(ztest.FailWriter{})),
 			DebugLevel,
 		),
 		ErrorOutput(errSink),
@@ -382,8 +382,8 @@ func TestLoggerSyncFail(t *testing.T) {
 	noSync := &ztest.Buffer{}
 	err := errors.New("fail")
 	noSync.SetError(err)
-	logger := New(zapcore.NewCore(
-		zapcore.NewJSONEncoder(zapcore.EncoderConfig{}),
+	logger := New(ladcore.NewCore(
+		ladcore.NewJSONEncoder(ladcore.EncoderConfig{}),
 		noSync,
 		DebugLevel,
 	))
@@ -527,8 +527,8 @@ func TestLoggerAddCallerFail(t *testing.T) {
 }
 
 func TestLoggerReplaceCore(t *testing.T) {
-	replace := WrapCore(func(zapcore.Core) zapcore.Core {
-		return zapcore.NewNopCore()
+	replace := WrapCore(func(ladcore.Core) ladcore.Core {
+		return ladcore.NewNopCore()
 	})
 	withLogger(t, DebugLevel, opts(replace), func(logger *Logger, logs *observer.ObservedLogs) {
 		logger.Debug("")
@@ -582,7 +582,7 @@ func TestLoggerConcurrent(t *testing.T) {
 			assert.Equal(
 				t,
 				observer.LoggedEntry{
-					Entry:   zapcore.Entry{Level: InfoLevel},
+					Entry:   ladcore.Entry{Level: InfoLevel},
 					Context: []Field{String("foo", "bar")},
 				},
 				obs,
@@ -598,7 +598,7 @@ func TestLoggerFatalOnNoop(t *testing.T) {
 	core, _ := observer.New(InfoLevel)
 
 	// We don't allow a no-op fatal hook.
-	New(core, WithFatalHook(zapcore.WriteThenNoop)).Fatal("great sadness")
+	New(core, WithFatalHook(ladcore.WriteThenNoop)).Fatal("great sadness")
 	assert.True(t, exitStub.Exited, "must exit for WriteThenNoop")
 	assert.Equal(t, 1, exitStub.Code, "must exit with status 1 for WriteThenNoop")
 }
@@ -606,17 +606,17 @@ func TestLoggerFatalOnNoop(t *testing.T) {
 func TestLoggerCustomOnFatal(t *testing.T) {
 	tests := []struct {
 		msg          string
-		onFatal      zapcore.CheckWriteAction
+		onFatal      ladcore.CheckWriteAction
 		recoverValue interface{}
 	}{
 		{
 			msg:          "panic",
-			onFatal:      zapcore.WriteThenPanic,
+			onFatal:      ladcore.WriteThenPanic,
 			recoverValue: "fatal",
 		},
 		{
 			msg:          "goexit",
-			onFatal:      zapcore.WriteThenGoexit,
+			onFatal:      ladcore.WriteThenGoexit,
 			recoverValue: nil,
 		},
 	}
@@ -639,7 +639,7 @@ func TestLoggerCustomOnFatal(t *testing.T) {
 				assert.False(t, finished, "expect goroutine to not finish after Fatal")
 
 				assert.Equal(t, []observer.LoggedEntry{{
-					Entry:   zapcore.Entry{Level: FatalLevel, Message: "fatal"},
+					Entry:   ladcore.Entry{Level: FatalLevel, Message: "fatal"},
 					Context: []Field{},
 				}}, logs.AllUntimed(), "unexpected logs")
 			})
@@ -651,7 +651,7 @@ type customWriteHook struct {
 	called bool
 }
 
-func (h *customWriteHook) OnWrite(_ *zapcore.CheckedEntry, _ []Field) {
+func (h *customWriteHook) OnWrite(_ *ladcore.CheckedEntry, _ []Field) {
 	h.called = true
 }
 

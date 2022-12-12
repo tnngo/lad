@@ -26,7 +26,7 @@ import (
 
 	"github.com/tnngo/lad/internal/exit"
 	"github.com/tnngo/lad/internal/ztest"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/zaptest/observer"
 
 	"github.com/stretchr/testify/assert"
@@ -37,19 +37,19 @@ func TestSugarWith(t *testing.T) {
 	// Convenience functions to create expected error logs.
 	ignored := func(msg interface{}) observer.LoggedEntry {
 		return observer.LoggedEntry{
-			Entry:   zapcore.Entry{Level: ErrorLevel, Message: _oddNumberErrMsg},
+			Entry:   ladcore.Entry{Level: ErrorLevel, Message: _oddNumberErrMsg},
 			Context: []Field{Any("ignored", msg)},
 		}
 	}
 	nonString := func(pairs ...invalidPair) observer.LoggedEntry {
 		return observer.LoggedEntry{
-			Entry:   zapcore.Entry{Level: ErrorLevel, Message: _nonStringKeyErrMsg},
+			Entry:   ladcore.Entry{Level: ErrorLevel, Message: _nonStringKeyErrMsg},
 			Context: []Field{Array("invalid", invalidPairs(pairs))},
 		}
 	}
 	ignoredError := func(err error) observer.LoggedEntry {
 		return observer.LoggedEntry{
-			Entry:   zapcore.Entry{Level: ErrorLevel, Message: _multipleErrMsg},
+			Entry:   ladcore.Entry{Level: ErrorLevel, Message: _multipleErrMsg},
 			Context: []Field{Error(err)},
 		}
 	}
@@ -156,7 +156,7 @@ func TestSugarWith(t *testing.T) {
 }
 
 func TestSugaredLoggerLevel(t *testing.T) {
-	levels := []zapcore.Level{
+	levels := []ladcore.Level{
 		DebugLevel,
 		InfoLevel,
 		WarnLevel,
@@ -180,7 +180,7 @@ func TestSugaredLoggerLevel(t *testing.T) {
 	t.Run("Nop", func(t *testing.T) {
 		t.Parallel()
 
-		assert.Equal(t, zapcore.InvalidLevel, NewNop().Sugar().Level())
+		assert.Equal(t, ladcore.InvalidLevel, NewNop().Sugar().Level())
 	})
 }
 
@@ -195,7 +195,7 @@ func TestSugarFieldsInvalidPairs(t *testing.T) {
 
 		// Assert that the error message's structured fields serialize properly.
 		require.Equal(t, 1, len(output[0].Context), "Expected one field in error entry context.")
-		enc := zapcore.NewMapObjectEncoder()
+		enc := ladcore.NewMapObjectEncoder()
 		output[0].Context[0].AddTo(enc)
 		assert.Equal(t, []interface{}{
 			map[string]interface{}{"position": int64(0), "key": int64(42), "value": "foo"},
@@ -230,9 +230,9 @@ func TestSugarStructuredLogging(t *testing.T) {
 			logger.With(context...).DPanicw(tt.msg, extra...)
 
 			expected := make([]observer.LoggedEntry, 5)
-			for i, lvl := range []zapcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel} {
+			for i, lvl := range []ladcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel} {
 				expected[i] = observer.LoggedEntry{
-					Entry:   zapcore.Entry{Message: tt.expectMsg, Level: lvl},
+					Entry:   ladcore.Entry{Message: tt.expectMsg, Level: lvl},
 					Context: expectedFields,
 				}
 			}
@@ -262,9 +262,9 @@ func TestSugarConcatenatingLogging(t *testing.T) {
 			logger.With(context...).DPanic(tt.args...)
 
 			expected := make([]observer.LoggedEntry, 5)
-			for i, lvl := range []zapcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel} {
+			for i, lvl := range []ladcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel} {
 				expected[i] = observer.LoggedEntry{
-					Entry:   zapcore.Entry{Message: tt.expect, Level: lvl},
+					Entry:   ladcore.Entry{Message: tt.expect, Level: lvl},
 					Context: expectedFields,
 				}
 			}
@@ -298,9 +298,9 @@ func TestSugarTemplatedLogging(t *testing.T) {
 			logger.With(context...).DPanicf(tt.format, tt.args...)
 
 			expected := make([]observer.LoggedEntry, 5)
-			for i, lvl := range []zapcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel} {
+			for i, lvl := range []ladcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel} {
 				expected[i] = observer.LoggedEntry{
-					Entry:   zapcore.Entry{Message: tt.expect, Level: lvl},
+					Entry:   ladcore.Entry{Message: tt.expect, Level: lvl},
 					Context: expectedFields,
 				}
 			}
@@ -334,9 +334,9 @@ func TestSugarLnLogging(t *testing.T) {
 			logger.With(context...).DPanicln(tt.args...)
 
 			expected := make([]observer.LoggedEntry, 5)
-			for i, lvl := range []zapcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel} {
+			for i, lvl := range []ladcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel} {
 				expected[i] = observer.LoggedEntry{
-					Entry:   zapcore.Entry{Message: tt.expect, Level: lvl},
+					Entry:   ladcore.Entry{Message: tt.expect, Level: lvl},
 					Context: expectedFields,
 				}
 			}
@@ -354,7 +354,7 @@ func TestSugarLnLoggingIgnored(t *testing.T) {
 
 func TestSugarPanicLogging(t *testing.T) {
 	tests := []struct {
-		loggerLevel zapcore.Level
+		loggerLevel ladcore.Level
 		f           func(*SugaredLogger)
 		expectedMsg string
 	}{
@@ -378,7 +378,7 @@ func TestSugarPanicLogging(t *testing.T) {
 			if tt.expectedMsg != "" {
 				assert.Equal(t, []observer.LoggedEntry{{
 					Context: []Field{},
-					Entry:   zapcore.Entry{Message: tt.expectedMsg, Level: PanicLevel},
+					Entry:   ladcore.Entry{Message: tt.expectedMsg, Level: PanicLevel},
 				}}, logs.AllUntimed(), "Unexpected log output.")
 			} else {
 				assert.Equal(t, 0, logs.Len(), "Didn't expect any log output.")
@@ -389,7 +389,7 @@ func TestSugarPanicLogging(t *testing.T) {
 
 func TestSugarFatalLogging(t *testing.T) {
 	tests := []struct {
-		loggerLevel zapcore.Level
+		loggerLevel ladcore.Level
 		f           func(*SugaredLogger)
 		expectedMsg string
 	}{
@@ -414,7 +414,7 @@ func TestSugarFatalLogging(t *testing.T) {
 			if tt.expectedMsg != "" {
 				assert.Equal(t, []observer.LoggedEntry{{
 					Context: []Field{},
-					Entry:   zapcore.Entry{Message: tt.expectedMsg, Level: FatalLevel},
+					Entry:   ladcore.Entry{Message: tt.expectedMsg, Level: FatalLevel},
 				}}, logs.AllUntimed(), "Unexpected log output.")
 			} else {
 				assert.Equal(t, 0, logs.Len(), "Didn't expect any log output.")

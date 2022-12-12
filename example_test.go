@@ -28,7 +28,7 @@ import (
 	"time"
 
 	zap "github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 func Example_presets() {
@@ -72,7 +72,7 @@ func Example_basicConfiguration() {
 	// and convenience. (For more complex needs, see the AdvancedConfiguration
 	// example.)
 	//
-	// See the documentation for Config and zapcore.EncoderConfig for all the
+	// See the documentation for Config and ladcore.EncoderConfig for all the
 	// available options.
 	rawJSON := []byte(`{
 	  "level": "debug",
@@ -102,7 +102,7 @@ func Example_basicConfiguration() {
 func Example_advancedConfiguration() {
 	// The bundled Config struct only supports the most common configuration
 	// options. More complex needs, like splitting logs between multiple files
-	// or writing to non-file outputs, require use of the zapcore package.
+	// or writing to non-file outputs, require use of the ladcore package.
 	//
 	// In this example, imagine we're both sending our logs to Kafka and writing
 	// them to the console. We'd like to encode the console output and the Kafka
@@ -110,41 +110,41 @@ func Example_advancedConfiguration() {
 	// high-priority logs.
 
 	// First, define our level-handling logic.
-	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl >= zapcore.ErrorLevel
+	highPriority := zap.LevelEnablerFunc(func(lvl ladcore.Level) bool {
+		return lvl >= ladcore.ErrorLevel
 	})
-	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl < zapcore.ErrorLevel
+	lowPriority := zap.LevelEnablerFunc(func(lvl ladcore.Level) bool {
+		return lvl < ladcore.ErrorLevel
 	})
 
 	// Assume that we have clients for two Kafka topics. The clients implement
-	// zapcore.WriteSyncer and are safe for concurrent use. (If they only
-	// implement io.Writer, we can use zapcore.AddSync to add a no-op Sync
+	// ladcore.WriteSyncer and are safe for concurrent use. (If they only
+	// implement io.Writer, we can use ladcore.AddSync to add a no-op Sync
 	// method. If they're not safe for concurrent use, we can add a protecting
-	// mutex with zapcore.Lock.)
-	topicDebugging := zapcore.AddSync(io.Discard)
-	topicErrors := zapcore.AddSync(io.Discard)
+	// mutex with ladcore.Lock.)
+	topicDebugging := ladcore.AddSync(io.Discard)
+	topicErrors := ladcore.AddSync(io.Discard)
 
 	// High-priority output should also go to standard error, and low-priority
 	// output should also go to standard out.
-	consoleDebugging := zapcore.Lock(os.Stdout)
-	consoleErrors := zapcore.Lock(os.Stderr)
+	consoleDebugging := ladcore.Lock(os.Stdout)
+	consoleErrors := ladcore.Lock(os.Stderr)
 
 	// Optimize the Kafka output for machine consumption and the console output
 	// for human operators.
-	kafkaEncoder := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
-	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+	kafkaEncoder := ladcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
+	consoleEncoder := ladcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
 
 	// Join the outputs, encoders, and level-handling functions into
-	// zapcore.Cores, then tee the four cores together.
-	core := zapcore.NewTee(
-		zapcore.NewCore(kafkaEncoder, topicErrors, highPriority),
-		zapcore.NewCore(consoleEncoder, consoleErrors, highPriority),
-		zapcore.NewCore(kafkaEncoder, topicDebugging, lowPriority),
-		zapcore.NewCore(consoleEncoder, consoleDebugging, lowPriority),
+	// ladcore.Cores, then tee the four cores together.
+	core := ladcore.NewTee(
+		ladcore.NewCore(kafkaEncoder, topicErrors, highPriority),
+		ladcore.NewCore(consoleEncoder, consoleErrors, highPriority),
+		ladcore.NewCore(kafkaEncoder, topicDebugging, lowPriority),
+		ladcore.NewCore(consoleEncoder, consoleDebugging, lowPriority),
 	)
 
-	// From a zapcore.Core, it's easy to construct a Logger.
+	// From a ladcore.Core, it's easy to construct a Logger.
 	logger := zap.New(core)
 	defer logger.Sync()
 	logger.Info("constructed a logger")
@@ -173,13 +173,13 @@ type request struct {
 	Remote addr
 }
 
-func (a addr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+func (a addr) MarshalLogObject(enc ladcore.ObjectEncoder) error {
 	enc.AddString("ip", a.IP)
 	enc.AddInt("port", a.Port)
 	return nil
 }
 
-func (r *request) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+func (r *request) MarshalLogObject(enc ladcore.ObjectEncoder) error {
 	enc.AddString("url", r.URL)
 	zap.Inline(r.Listen).AddTo(enc)
 	return enc.AddObject("remote", r.Remote)
@@ -242,9 +242,9 @@ func ExampleAtomicLevel() {
 	encoderCfg := zap.NewProductionEncoderConfig()
 	encoderCfg.TimeKey = ""
 
-	logger := zap.New(zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderCfg),
-		zapcore.Lock(os.Stdout),
+	logger := zap.New(ladcore.NewCore(
+		ladcore.NewJSONEncoder(encoderCfg),
+		ladcore.Lock(os.Stdout),
 		atom,
 	))
 	defer logger.Sync()
@@ -326,8 +326,8 @@ func ExampleLogger_Named() {
 func ExampleWrapCore_replace() {
 	// Replacing a Logger's core can alter fundamental behaviors.
 	// For example, it can convert a Logger to a no-op.
-	nop := zap.WrapCore(func(zapcore.Core) zapcore.Core {
-		return zapcore.NewNopCore()
+	nop := zap.WrapCore(func(ladcore.Core) ladcore.Core {
+		return ladcore.NewNopCore()
 	})
 
 	logger := zap.NewExample()
@@ -344,8 +344,8 @@ func ExampleWrapCore_replace() {
 func ExampleWrapCore_wrap() {
 	// Wrapping a Logger's core can extend its functionality. As a trivial
 	// example, it can double-write all logs.
-	doubled := zap.WrapCore(func(c zapcore.Core) zapcore.Core {
-		return zapcore.NewTee(c, c)
+	doubled := zap.WrapCore(func(c ladcore.Core) ladcore.Core {
+		return ladcore.NewTee(c, c)
 	})
 
 	logger := zap.NewExample()

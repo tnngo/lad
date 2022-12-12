@@ -30,7 +30,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 func TestObjectsAndObjectValues(t *testing.T) {
@@ -100,7 +100,7 @@ func TestObjectsAndObjectValues(t *testing.T) {
 
 			tt.give.Key = "k"
 
-			enc := zapcore.NewMapObjectEncoder()
+			enc := ladcore.NewMapObjectEncoder()
 			tt.give.AddTo(enc)
 			assert.Equal(t, tt.want, enc.Fields["k"])
 		})
@@ -109,7 +109,7 @@ func TestObjectsAndObjectValues(t *testing.T) {
 
 type emptyObject struct{}
 
-func (*emptyObject) MarshalLogObject(zapcore.ObjectEncoder) error {
+func (*emptyObject) MarshalLogObject(ladcore.ObjectEncoder) error {
 	return nil
 }
 
@@ -118,7 +118,7 @@ type fakeObject struct {
 	err   error // marshaling error, if any
 }
 
-func (o *fakeObject) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+func (o *fakeObject) MarshalLogObject(enc ladcore.ObjectEncoder) error {
 	enc.AddString("value", o.value)
 	return o.err
 }
@@ -167,7 +167,7 @@ func TestObjectsAndObjectValues_marshalError(t *testing.T) {
 
 			tt.give.Key = "k"
 
-			enc := zapcore.NewMapObjectEncoder()
+			enc := ladcore.NewMapObjectEncoder()
 			tt.give.AddTo(enc)
 
 			require.Contains(t, enc.Fields, "k")
@@ -232,7 +232,7 @@ func TestStringers(t *testing.T) {
 
 			tt.give.Key = "k"
 
-			enc := zapcore.NewMapObjectEncoder()
+			enc := ladcore.NewMapObjectEncoder()
 			tt.give.AddTo(enc)
 			assert.Equal(t, tt.want, enc.Fields["k"])
 		})

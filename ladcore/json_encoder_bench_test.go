@@ -18,14 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore_test
+package ladcore_test
 
 import (
 	"encoding/json"
 	"testing"
 	"time"
 
-	. "github.com/tnngo/lad/zapcore"
+	. "github.com/tnngo/lad/ladcore"
 )
 
 func BenchmarkJSONLogMarshalerFunc(b *testing.B) {

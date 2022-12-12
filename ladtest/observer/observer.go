@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package observer provides a zapcore.Core that keeps an in-memory,
+// Package observer provides a ladcore.Core that keeps an in-memory,
 // encoding-agnostic representation of log entries. It's useful for
 // applications that want to unit test their log output without tying their
 // tests to a particular output encoding.
@@ -29,12 +29,8 @@ import (
 	"sync"
 	"time"
 
-<<<<<<< HEAD
-	"github.com/tnngo/lad/zapcore"
-=======
-	"go.uber.org/zap/internal"
-	"go.uber.org/zap/zapcore"
->>>>>>> upstream/master
+	"github.com/tnngo/lad/internal"
+	"github.com/tnngo/lad/ladcore"
 )
 
 // ObservedLogs is a concurrency-safe, ordered collection of observed logs.
@@ -82,7 +78,7 @@ func (o *ObservedLogs) AllUntimed() []LoggedEntry {
 }
 
 // FilterLevelExact filters entries to those logged at exactly the given level.
-func (o *ObservedLogs) FilterLevelExact(level zapcore.Level) *ObservedLogs {
+func (o *ObservedLogs) FilterLevelExact(level ladcore.Level) *ObservedLogs {
 	return o.Filter(func(e LoggedEntry) bool {
 		return e.Level == level
 	})
@@ -103,7 +99,7 @@ func (o *ObservedLogs) FilterMessageSnippet(snippet string) *ObservedLogs {
 }
 
 // FilterField filters entries to those that have the specified field.
-func (o *ObservedLogs) FilterField(field zapcore.Field) *ObservedLogs {
+func (o *ObservedLogs) FilterField(field ladcore.Field) *ObservedLogs {
 	return o.Filter(func(e LoggedEntry) bool {
 		for _, ctxField := range e.Context {
 			if ctxField.Equals(field) {
@@ -149,7 +145,7 @@ func (o *ObservedLogs) add(log LoggedEntry) {
 
 // New creates a new Core that buffers logs in memory (without any encoding).
 // It's particularly useful in tests.
-func New(enab zapcore.LevelEnabler) (zapcore.Core, *ObservedLogs) {
+func New(enab ladcore.LevelEnabler) (ladcore.Core, *ObservedLogs) {
 	ol := &ObservedLogs{}
 	return &contextObserver{
 		LevelEnabler: enab,
@@ -158,28 +154,28 @@ func New(enab zapcore.LevelEnabler) (zapcore.Core, *ObservedLogs) {
 }
 
 type contextObserver struct {
-	zapcore.LevelEnabler
+	ladcore.LevelEnabler
 	logs    *ObservedLogs
-	context []zapcore.Field
+	context []ladcore.Field
 }
 
 var (
-	_ zapcore.Core            = (*contextObserver)(nil)
+	_ ladcore.Core            = (*contextObserver)(nil)
 	_ internal.LeveledEnabler = (*contextObserver)(nil)
 )
 
-func (co *contextObserver) Level() zapcore.Level {
-	return zapcore.LevelOf(co.LevelEnabler)
+func (co *contextObserver) Level() ladcore.Level {
+	return ladcore.LevelOf(co.LevelEnabler)
 }
 
-func (co *contextObserver) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
+func (co *contextObserver) Check(ent ladcore.Entry, ce *ladcore.CheckedEntry) *ladcore.CheckedEntry {
 	if co.Enabled(ent.Level) {
 		return ce.AddCore(ent, co)
 	}
 	return ce
 }
 
-func (co *contextObserver) With(fields []zapcore.Field) zapcore.Core {
+func (co *contextObserver) With(fields []ladcore.Field) ladcore.Core {
 	return &contextObserver{
 		LevelEnabler: co.LevelEnabler,
 		logs:         co.logs,
@@ -187,8 +183,8 @@ func (co *contextObserver) With(fields []zapcore.Field) zapcore.Core {
 	}
 }
 
-func (co *contextObserver) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	all := make([]zapcore.Field, 0, len(fields)+len(co.context))
+func (co *contextObserver) Write(ent ladcore.Entry, fields []ladcore.Field) error {
+	all := make([]ladcore.Field, 0, len(fields)+len(co.context))
 	all = append(all, co.context...)
 	all = append(all, fields...)
 	co.logs.add(LoggedEntry{ent, all})

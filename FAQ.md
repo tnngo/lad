@@ -123,19 +123,19 @@ Zap doesn't natively support rotating log files, since we prefer to leave this
 to an external program like `logrotate`.
 
 However, it's easy to integrate a log rotation package like
-[`gopkg.in/natefinch/lumberjack.v2`][lumberjack] as a `zapcore.WriteSyncer`.
+[`gopkg.in/natefinch/lumberjack.v2`][lumberjack] as a `ladcore.WriteSyncer`.
 
 ```go
 // lumberjack.Logger is already safe for concurrent use, so we don't need to
 // lock it.
-w := zapcore.AddSync(&lumberjack.Logger{
+w := ladcore.AddSync(&lumberjack.Logger{
   Filename:   "/var/log/myapp/foo.log",
   MaxSize:    500, // megabytes
   MaxBackups: 3,
   MaxAge:     28, // days
 })
-core := zapcore.NewCore(
-  zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+core := ladcore.NewCore(
+  ladcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
   w,
   zap.InfoLevel,
 )

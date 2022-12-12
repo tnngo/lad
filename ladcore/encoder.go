@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore
+package ladcore
 
 import (
 	"encoding/json"
@@ -312,7 +312,7 @@ func (e *NameEncoder) UnmarshalText(text []byte) error {
 }
 
 // An EncoderConfig allows users to configure the concrete encoders supplied by
-// zapcore.
+// ladcore.
 type EncoderConfig struct {
 	// Set the keys used for each log entry. If any key is empty, that portion
 	// of the entry is omitted.

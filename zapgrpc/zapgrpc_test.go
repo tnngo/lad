@@ -25,14 +25,14 @@ import (
 	"testing"
 
 	zap "github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/zaptest/observer"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestLoggerInfoExpected(t *testing.T) {
-	checkMessages(t, zapcore.DebugLevel, nil, zapcore.InfoLevel, []string{
+	checkMessages(t, ladcore.DebugLevel, nil, ladcore.InfoLevel, []string{
 		"hello",
 		"s1s21 2 3s34s56",
 		"hello world",
@@ -66,7 +66,7 @@ func TestLoggerInfoExpected(t *testing.T) {
 }
 
 func TestLoggerDebugExpected(t *testing.T) {
-	checkMessages(t, zapcore.DebugLevel, []Option{WithDebug()}, zapcore.DebugLevel, []string{
+	checkMessages(t, ladcore.DebugLevel, []Option{WithDebug()}, ladcore.DebugLevel, []string{
 		"hello",
 		"s1s21 2 3s34s56",
 		"hello world",
@@ -86,7 +86,7 @@ func TestLoggerDebugExpected(t *testing.T) {
 }
 
 func TestLoggerDebugSuppressed(t *testing.T) {
-	checkMessages(t, zapcore.InfoLevel, []Option{WithDebug()}, zapcore.DebugLevel, nil, func(logger *Logger) {
+	checkMessages(t, ladcore.InfoLevel, []Option{WithDebug()}, ladcore.DebugLevel, nil, func(logger *Logger) {
 		logger.Print("hello")
 		logger.Printf("%s world", "hello")
 		logger.Println()
@@ -96,7 +96,7 @@ func TestLoggerDebugSuppressed(t *testing.T) {
 }
 
 func TestLoggerWarningExpected(t *testing.T) {
-	checkMessages(t, zapcore.DebugLevel, nil, zapcore.WarnLevel, []string{
+	checkMessages(t, ladcore.DebugLevel, nil, ladcore.WarnLevel, []string{
 		"hello",
 		"s1s21 2 3s34s56",
 		"hello world",
@@ -116,7 +116,7 @@ func TestLoggerWarningExpected(t *testing.T) {
 }
 
 func TestLoggerErrorExpected(t *testing.T) {
-	checkMessages(t, zapcore.DebugLevel, nil, zapcore.ErrorLevel, []string{
+	checkMessages(t, ladcore.DebugLevel, nil, ladcore.ErrorLevel, []string{
 		"hello",
 		"s1s21 2 3s34s56",
 		"hello world",
@@ -136,7 +136,7 @@ func TestLoggerErrorExpected(t *testing.T) {
 }
 
 func TestLoggerFatalExpected(t *testing.T) {
-	checkMessages(t, zapcore.DebugLevel, nil, zapcore.FatalLevel, []string{
+	checkMessages(t, ladcore.DebugLevel, nil, ladcore.FatalLevel, []string{
 		"hello",
 		"s1s21 2 3s34s56",
 		"hello world",
@@ -157,42 +157,42 @@ func TestLoggerFatalExpected(t *testing.T) {
 
 func TestLoggerV(t *testing.T) {
 	tests := []struct {
-		zapLevel     zapcore.Level
+		zapLevel     ladcore.Level
 		grpcEnabled  []int
 		grpcDisabled []int
 	}{
 		{
-			zapLevel:     zapcore.DebugLevel,
+			zapLevel:     ladcore.DebugLevel,
 			grpcEnabled:  []int{grpcLvlInfo, grpcLvlWarn, grpcLvlError, grpcLvlFatal},
 			grpcDisabled: []int{}, // everything is enabled, nothing is disabled
 		},
 		{
-			zapLevel:     zapcore.InfoLevel,
+			zapLevel:     ladcore.InfoLevel,
 			grpcEnabled:  []int{grpcLvlInfo, grpcLvlWarn, grpcLvlError, grpcLvlFatal},
 			grpcDisabled: []int{}, // everything is enabled, nothing is disabled
 		},
 		{
-			zapLevel:     zapcore.WarnLevel,
+			zapLevel:     ladcore.WarnLevel,
 			grpcEnabled:  []int{grpcLvlWarn, grpcLvlError, grpcLvlFatal},
 			grpcDisabled: []int{grpcLvlInfo},
 		},
 		{
-			zapLevel:     zapcore.ErrorLevel,
+			zapLevel:     ladcore.ErrorLevel,
 			grpcEnabled:  []int{grpcLvlError, grpcLvlFatal},
 			grpcDisabled: []int{grpcLvlInfo, grpcLvlWarn},
 		},
 		{
-			zapLevel:     zapcore.DPanicLevel,
+			zapLevel:     ladcore.DPanicLevel,
 			grpcEnabled:  []int{grpcLvlFatal},
 			grpcDisabled: []int{grpcLvlInfo, grpcLvlWarn, grpcLvlError},
 		},
 		{
-			zapLevel:     zapcore.PanicLevel,
+			zapLevel:     ladcore.PanicLevel,
 			grpcEnabled:  []int{grpcLvlFatal},
 			grpcDisabled: []int{grpcLvlInfo, grpcLvlWarn, grpcLvlError},
 		},
 		{
-			zapLevel:     zapcore.FatalLevel,
+			zapLevel:     ladcore.FatalLevel,
 			grpcEnabled:  []int{grpcLvlFatal},
 			grpcDisabled: []int{grpcLvlInfo, grpcLvlWarn, grpcLvlError},
 		},
@@ -217,7 +217,7 @@ func TestLoggerV(t *testing.T) {
 
 func checkLevel(
 	t testing.TB,
-	enab zapcore.LevelEnabler,
+	enab ladcore.LevelEnabler,
 	expectedBool bool,
 	f func(*Logger) bool,
 ) {
@@ -233,14 +233,14 @@ func checkLevel(
 
 func checkMessages(
 	t testing.TB,
-	enab zapcore.LevelEnabler,
+	enab ladcore.LevelEnabler,
 	opts []Option,
-	expectedLevel zapcore.Level,
+	expectedLevel ladcore.Level,
 	expectedMessages []string,
 	f func(*Logger),
 ) {
-	if expectedLevel == zapcore.FatalLevel {
-		expectedLevel = zapcore.WarnLevel
+	if expectedLevel == ladcore.FatalLevel {
+		expectedLevel = ladcore.WarnLevel
 	}
 	withLogger(enab, opts, func(logger *Logger, observedLogs *observer.ObservedLogs) {
 		f(logger)
@@ -254,7 +254,7 @@ func checkMessages(
 }
 
 func withLogger(
-	enab zapcore.LevelEnabler,
+	enab ladcore.LevelEnabler,
 	opts []Option,
 	f func(*Logger, *observer.ObservedLogs),
 ) {

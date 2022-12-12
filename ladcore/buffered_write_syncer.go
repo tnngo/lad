@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore
+package ladcore
 
 import (
 	"bufio"
@@ -42,7 +42,7 @@ const (
 // fixed interval--whichever comes first.
 //
 // BufferedWriteSyncer is safe for concurrent use. You don't need to use
-// zapcore.Lock for WriteSyncers with BufferedWriteSyncer.
+// ladcore.Lock for WriteSyncers with BufferedWriteSyncer.
 //
 // To set up a BufferedWriteSyncer, construct a WriteSyncer for your log
 // destination (*os.File is a valid WriteSyncer), wrap it with
@@ -51,11 +51,11 @@ const (
 //
 //	 func main() {
 //	   ws := ... // your log destination
-//	   bws := &zapcore.BufferedWriteSyncer{WS: ws}
+//	   bws := &ladcore.BufferedWriteSyncer{WS: ws}
 //	   defer bws.Stop()
 //
 //	   // ...
-//	   core := zapcore.NewCore(enc, bws, lvl)
+//	   core := ladcore.NewCore(enc, bws, lvl)
 //	   logger := zap.New(core)
 //
 //	   // ...

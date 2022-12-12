@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +33,7 @@ func BenchmarkBoolsArrayMarshaler(b *testing.B) {
 	// Keep this benchmark here to capture the overhead of the ArrayMarshaler
 	// wrapper.
 	bs := make([]bool, 50)
-	enc := zapcore.NewJSONEncoder(zapcore.EncoderConfig{})
+	enc := ladcore.NewJSONEncoder(ladcore.EncoderConfig{})
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		Bools("array", bs).AddTo(enc.Clone())
@@ -42,7 +42,7 @@ func BenchmarkBoolsArrayMarshaler(b *testing.B) {
 
 func BenchmarkBoolsReflect(b *testing.B) {
 	bs := make([]bool, 50)
-	enc := zapcore.NewJSONEncoder(zapcore.EncoderConfig{})
+	enc := ladcore.NewJSONEncoder(ladcore.EncoderConfig{})
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		Reflect("array", bs).AddTo(enc.Clone())
@@ -98,7 +98,7 @@ func TestArrayWrappers(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		enc := zapcore.NewMapObjectEncoder()
+		enc := ladcore.NewMapObjectEncoder()
 		tt.field.Key = "k"
 		tt.field.AddTo(enc)
 		assert.Equal(t, tt.expected, enc.Fields["k"], "%s: unexpected map contents.", tt.desc)

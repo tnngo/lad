@@ -31,7 +31,7 @@ import (
 	"testing"
 
 	zap "github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -43,7 +43,7 @@ import (
 // which includes filenames.
 var _zapPackages = []string{
 	"github.com/tnngo/lad.",
-	"github.com/tnngo/lad/zapcore.",
+	"github.com/tnngo/lad/ladcore.",
 }
 
 func TestStacktraceFiltersZapLog(t *testing.T) {
@@ -58,12 +58,12 @@ func TestStacktraceFiltersZapLog(t *testing.T) {
 
 func TestStacktraceFiltersZapMarshal(t *testing.T) {
 	withLogger(t, func(logger *zap.Logger, out *bytes.Buffer) {
-		marshal := func(enc zapcore.ObjectEncoder) error {
+		marshal := func(enc ladcore.ObjectEncoder) error {
 			logger.Warn("marshal caused warn")
 			enc.AddString("f", "v")
 			return nil
 		}
-		logger.Error("test log", zap.Object("obj", zapcore.ObjectMarshalerFunc(marshal)))
+		logger.Error("test log", zap.Object("obj", ladcore.ObjectMarshalerFunc(marshal)))
 
 		logs := out.String()
 
@@ -147,8 +147,8 @@ func TestStacktraceWithCallerSkip(t *testing.T) {
 // The inbuilt observer does not call Marshal for objects/arrays, which we need for some tests.
 func withLogger(t *testing.T, fn func(logger *zap.Logger, out *bytes.Buffer)) {
 	buf := &bytes.Buffer{}
-	encoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-	core := zapcore.NewCore(encoder, zapcore.AddSync(buf), zapcore.DebugLevel)
+	encoder := ladcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+	core := ladcore.NewCore(encoder, ladcore.AddSync(buf), ladcore.DebugLevel)
 	logger := zap.New(core, zap.AddStacktrace(zap.DebugLevel))
 	fn(logger, buf)
 }

@@ -26,14 +26,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/zapgrpc"
 	"github.com/tnngo/lad/zaptest/observer"
 	"google.golang.org/grpc/grpclog"
 )
 
 func TestLoggerV2(t *testing.T) {
-	core, observedLogs := observer.New(zapcore.InfoLevel)
+	core, observedLogs := observer.New(ladcore.InfoLevel)
 	zlog := zap.New(core)
 
 	grpclog.SetLoggerV2(zapgrpc.NewLogger(zlog))
@@ -44,7 +44,7 @@ func TestLoggerV2(t *testing.T) {
 	require.Len(t, logs, 1, "Expected one log entry.")
 	entry := logs[0]
 
-	assert.Equal(t, zapcore.InfoLevel, entry.Level,
+	assert.Equal(t, ladcore.InfoLevel, entry.Level,
 		"Log entry level did not match.")
 	assert.Equal(t, "hello from grpc", entry.Message,
 		"Log entry message did not match.")

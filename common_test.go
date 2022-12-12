@@ -24,7 +24,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/zaptest/observer"
 )
 
@@ -34,13 +34,13 @@ func opts(opts ...Option) []Option {
 
 // Here specifically to introduce an easily-identifiable filename for testing
 // stacktraces and caller skips.
-func withLogger(t testing.TB, e zapcore.LevelEnabler, opts []Option, f func(*Logger, *observer.ObservedLogs)) {
+func withLogger(t testing.TB, e ladcore.LevelEnabler, opts []Option, f func(*Logger, *observer.ObservedLogs)) {
 	fac, logs := observer.New(e)
 	log := New(fac, opts...)
 	f(log, logs)
 }
 
-func withSugar(t testing.TB, e zapcore.LevelEnabler, opts []Option, f func(*SugaredLogger, *observer.ObservedLogs)) {
+func withSugar(t testing.TB, e ladcore.LevelEnabler, opts []Option, f func(*SugaredLogger, *observer.ObservedLogs)) {
 	withLogger(t, e, opts, func(logger *Logger, logs *observer.ObservedLogs) { f(logger.Sugar(), logs) })
 }
 

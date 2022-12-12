@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore_test
+package ladcore_test
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tnngo/lad/internal/ztest"
-	. "github.com/tnngo/lad/zapcore"
+	. "github.com/tnngo/lad/ladcore"
 	"go.uber.org/atomic"
 )
 

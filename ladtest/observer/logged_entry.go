@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Uber Technologies, Inc.
+// Copyright (c) 2017 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,27 +18,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zaptest
+package observer
 
-import "github.com/tnngo/lad/internal/ztest"
+import "github.com/tnngo/lad/ladcore"
 
-type (
-	// A Syncer is a spy for the Sync portion of zapcore.WriteSyncer.
-	Syncer = ztest.Syncer
+// An LoggedEntry is an encoding-agnostic representation of a log message.
+// Field availability is context dependant.
+type LoggedEntry struct {
+	ladcore.Entry
+	Context []ladcore.Field
+}
 
-	// A Discarder sends all writes to io.Discard.
-	Discarder = ztest.Discarder
-
-	// FailWriter is a WriteSyncer that always returns an error on writes.
-	FailWriter = ztest.FailWriter
-
-	// ShortWriter is a WriteSyncer whose write method never returns an error,
-	// but always reports that it wrote one byte less than the input slice's
-	// length (thus, a "short write").
-	ShortWriter = ztest.ShortWriter
-
-	// Buffer is an implementation of zapcore.WriteSyncer that sends all writes to
-	// a bytes.Buffer. It has convenience methods to split the accumulated buffer
-	// on newlines.
-	Buffer = ztest.Buffer
-)
+// ContextMap returns a map for all fields in Context.
+func (e LoggedEntry) ContextMap() map[string]interface{} {
+	encoder := ladcore.NewMapObjectEncoder()
+	for _, f := range e.Context {
+		f.AddTo(encoder)
+	}
+	return encoder.Fields
+}

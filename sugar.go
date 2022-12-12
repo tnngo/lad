@@ -24,7 +24,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 
 	"go.uber.org/multierr"
 )
@@ -118,9 +118,9 @@ func (s *SugaredLogger) With(args ...interface{}) *SugaredLogger {
 
 // Level reports the minimum enabled level for this logger.
 //
-// For NopLoggers, this is [zapcore.InvalidLevel].
-func (s *SugaredLogger) Level() zapcore.Level {
-	return zapcore.LevelOf(s.base.core)
+// For NopLoggers, this is [ladcore.InvalidLevel].
+func (s *SugaredLogger) Level() ladcore.Level {
+	return ladcore.LevelOf(s.base.core)
 }
 
 // Debug uses fmt.Sprint to construct and log a message.
@@ -284,7 +284,7 @@ func (s *SugaredLogger) Sync() error {
 }
 
 // log message with Sprint, Sprintf, or neither.
-func (s *SugaredLogger) log(lvl zapcore.Level, template string, fmtArgs []interface{}, context []interface{}) {
+func (s *SugaredLogger) log(lvl ladcore.Level, template string, fmtArgs []interface{}, context []interface{}) {
 	// If logging at this level is completely disabled, skip the overhead of
 	// string formatting.
 	if lvl < DPanicLevel && !s.base.Core().Enabled(lvl) {
@@ -298,7 +298,7 @@ func (s *SugaredLogger) log(lvl zapcore.Level, template string, fmtArgs []interf
 }
 
 // logln message with Sprintln
-func (s *SugaredLogger) logln(lvl zapcore.Level, fmtArgs []interface{}, context []interface{}) {
+func (s *SugaredLogger) logln(lvl ladcore.Level, fmtArgs []interface{}, context []interface{}) {
 	if lvl < DPanicLevel && !s.base.Core().Enabled(lvl) {
 		return
 	}
@@ -399,7 +399,7 @@ type invalidPair struct {
 	key, value interface{}
 }
 
-func (p invalidPair) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+func (p invalidPair) MarshalLogObject(enc ladcore.ObjectEncoder) error {
 	enc.AddInt64("position", int64(p.position))
 	Any("key", p.key).AddTo(enc)
 	Any("value", p.value).AddTo(enc)
@@ -408,7 +408,7 @@ func (p invalidPair) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 
 type invalidPairs []invalidPair
 
-func (ps invalidPairs) MarshalLogArray(enc zapcore.ArrayEncoder) error {
+func (ps invalidPairs) MarshalLogArray(enc ladcore.ArrayEncoder) error {
 	var err error
 	for i := range ps {
 		err = multierr.Append(err, enc.AppendObject(ps[i]))

@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	zap "github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/zaptest/observer"
 )
 
@@ -36,9 +36,9 @@ func TestWriter(t *testing.T) {
 
 	tests := []struct {
 		desc   string
-		level  zapcore.Level // defaults to info
+		level  ladcore.Level // defaults to info
 		writes []string
-		want   []zapcore.Entry
+		want   []ladcore.Entry
 	}{
 		{
 			desc: "simple",
@@ -47,7 +47,7 @@ func TestWriter(t *testing.T) {
 				"bar\n",
 				"baz\n",
 			},
-			want: []zapcore.Entry{
+			want: []ladcore.Entry{
 				{Level: zap.InfoLevel, Message: "foo"},
 				{Level: zap.InfoLevel, Message: "bar"},
 				{Level: zap.InfoLevel, Message: "baz"},
@@ -60,7 +60,7 @@ func TestWriter(t *testing.T) {
 				"foo\n",
 				"bar\n",
 			},
-			want: []zapcore.Entry{},
+			want: []ladcore.Entry{},
 		},
 		{
 			desc:  "multiple newlines in a message",
@@ -70,7 +70,7 @@ func TestWriter(t *testing.T) {
 				"baz\n",
 				"qux\nquux\n",
 			},
-			want: []zapcore.Entry{
+			want: []ladcore.Entry{
 				{Level: zap.WarnLevel, Message: "foo"},
 				{Level: zap.WarnLevel, Message: "bar"},
 				{Level: zap.WarnLevel, Message: "baz"},
@@ -86,7 +86,7 @@ func TestWriter(t *testing.T) {
 				"bar\nbaz",
 				"qux",
 			},
-			want: []zapcore.Entry{
+			want: []ladcore.Entry{
 				{Level: zap.ErrorLevel, Message: "foobar"},
 				{Level: zap.ErrorLevel, Message: "bazqux"},
 			},
@@ -96,7 +96,7 @@ func TestWriter(t *testing.T) {
 			writes: []string{
 				"foo\n\nbar\nbaz",
 			},
-			want: []zapcore.Entry{
+			want: []ladcore.Entry{
 				{Level: zap.InfoLevel, Message: "foo"},
 				{Level: zap.InfoLevel, Message: ""},
 				{Level: zap.InfoLevel, Message: "bar"},
@@ -108,7 +108,7 @@ func TestWriter(t *testing.T) {
 			writes: []string{
 				"foo\nbar\nbaz\n",
 			},
-			want: []zapcore.Entry{
+			want: []ladcore.Entry{
 				{Level: zap.InfoLevel, Message: "foo"},
 				{Level: zap.InfoLevel, Message: "bar"},
 				{Level: zap.InfoLevel, Message: "baz"},
@@ -119,7 +119,7 @@ func TestWriter(t *testing.T) {
 			writes: []string{
 				"foo\nbar\nbaz\n\n",
 			},
-			want: []zapcore.Entry{
+			want: []ladcore.Entry{
 				{Level: zap.InfoLevel, Message: "foo"},
 				{Level: zap.InfoLevel, Message: "bar"},
 				{Level: zap.InfoLevel, Message: "baz"},
@@ -147,8 +147,8 @@ func TestWriter(t *testing.T) {
 
 			assert.NoError(t, w.Close(), "Writer.Close failed.")
 
-			// Turn []observer.LoggedEntry => []zapcore.Entry
-			got := make([]zapcore.Entry, observed.Len())
+			// Turn []observer.LoggedEntry => []ladcore.Entry
+			got := make([]ladcore.Entry, observed.Len())
 			for i, ent := range observed.AllUntimed() {
 				got[i] = ent.Entry
 			}
@@ -180,7 +180,7 @@ func TestWrite_Sync(t *testing.T) {
 		require.NoError(t, w.Sync(), "Sync must not fail")
 
 		assert.Equal(t, []observer.LoggedEntry{
-			{Entry: zapcore.Entry{Message: "foobar"}, Context: []zapcore.Field{}},
+			{Entry: ladcore.Entry{Message: "foobar"}, Context: []ladcore.Field{}},
 		}, observed.AllUntimed(), "Log messages did not match")
 	})
 
@@ -214,7 +214,7 @@ func BenchmarkWriter(b *testing.B) {
 
 	writer := Writer{
 		Log:   zap.New(new(partiallyNopCore)),
-		Level: zapcore.DebugLevel,
+		Level: ladcore.DebugLevel,
 	}
 
 	for _, tt := range tests {
@@ -237,12 +237,12 @@ func BenchmarkWriter(b *testing.B) {
 // of logging.
 type partiallyNopCore struct{}
 
-func (*partiallyNopCore) Enabled(zapcore.Level) bool { return true }
+func (*partiallyNopCore) Enabled(ladcore.Level) bool { return true }
 
-func (c *partiallyNopCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
+func (c *partiallyNopCore) Check(ent ladcore.Entry, ce *ladcore.CheckedEntry) *ladcore.CheckedEntry {
 	return ce.AddCore(ent, c)
 }
 
-func (c *partiallyNopCore) With([]zapcore.Field) zapcore.Core        { return c }
-func (*partiallyNopCore) Write(zapcore.Entry, []zapcore.Field) error { return nil }
+func (c *partiallyNopCore) With([]ladcore.Field) ladcore.Core        { return c }
+func (*partiallyNopCore) Write(ladcore.Entry, []ladcore.Field) error { return nil }
 func (*partiallyNopCore) Sync() error                                { return nil }

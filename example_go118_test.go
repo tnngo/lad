@@ -30,7 +30,7 @@ func ExampleObjects() {
 	defer logger.Sync()
 
 	// Use the Objects field constructor when you have a list of objects,
-	// all of which implement zapcore.ObjectMarshaler.
+	// all of which implement ladcore.ObjectMarshaler.
 	logger.Debug("opening connections",
 		lad.Objects("addrs", []addr{
 			{IP: "123.45.67.89", Port: 4040},
@@ -46,7 +46,7 @@ func ExampleObjectValues() {
 	defer logger.Sync()
 
 	// Use the ObjectValues field constructor when you have a list of
-	// objects that do not implement zapcore.ObjectMarshaler directly,
+	// objects that do not implement ladcore.ObjectMarshaler directly,
 	// but on their pointer receivers.
 	logger.Debug("starting tunnels",
 		lad.ObjectValues("addrs", []request{

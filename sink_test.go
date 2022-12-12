@@ -30,7 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 func stubSinkRegistry(t testing.TB) *sinkRegistry {
@@ -57,12 +57,12 @@ func TestRegisterSink(t *testing.T) {
 	memFactory := func(u *url.URL) (Sink, error) {
 		assert.Equal(t, u.Scheme, memScheme, "Scheme didn't match registration.")
 		memCalls++
-		return nopCloserSink{zapcore.AddSync(buf)}, nil
+		return nopCloserSink{ladcore.AddSync(buf)}, nil
 	}
 	nopFactory := func(u *url.URL) (Sink, error) {
 		assert.Equal(t, u.Scheme, nopScheme, "Scheme didn't match registration.")
 		nopCalls++
-		return nopCloserSink{zapcore.AddSync(io.Discard)}, nil
+		return nopCloserSink{ladcore.AddSync(io.Discard)}, nil
 	}
 
 	require.NoError(t, RegisterSink(strings.ToUpper(memScheme), memFactory), "Failed to register scheme %q.", memScheme)
@@ -86,7 +86,7 @@ func TestRegisterSink(t *testing.T) {
 
 func TestRegisterSinkErrors(t *testing.T) {
 	nopFactory := func(_ *url.URL) (Sink, error) {
-		return nopCloserSink{zapcore.AddSync(io.Discard)}, nil
+		return nopCloserSink{ladcore.AddSync(io.Discard)}, nil
 	}
 	tests := []struct {
 		scheme string

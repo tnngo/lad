@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package zapcore defines and implements the low-level interfaces upon which
+// Package ladcore defines and implements the low-level interfaces upon which
 // zap is built. By providing alternate implementations of these interfaces,
 // external packages can extend zap's capabilities.
-package zapcore // import "github.com/tnngo/lad/zapcore"
+package ladcore // import "github.com/tnngo/lad/ladcore"

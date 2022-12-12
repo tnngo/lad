@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore_test
+package ladcore_test
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"github.com/tnngo/lad/internal/ztest"
-	. "github.com/tnngo/lad/zapcore"
+	. "github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/zaptest/observer"
 	"go.uber.org/atomic"
 

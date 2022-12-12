@@ -29,7 +29,7 @@ import (
 	"github.com/tnngo/lad/internal/exit"
 	"github.com/tnngo/lad/internal/ztest"
 
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/zaptest/observer"
 
 	"github.com/stretchr/testify/assert"
@@ -51,7 +51,7 @@ func TestReplaceGlobals(t *testing.T) {
 		L().Info("captured")
 		S().Info("captured")
 		expected := observer.LoggedEntry{
-			Entry:   zapcore.Entry{Message: "captured"},
+			Entry:   ladcore.Entry{Message: "captured"},
 			Context: []Field{},
 		}
 		assert.Equal(
@@ -104,7 +104,7 @@ func TestNewStdLog(t *testing.T) {
 
 func TestNewStdLogAt(t *testing.T) {
 	// include DPanicLevel here, but do not include Development in options
-	levels := []zapcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel}
+	levels := []ladcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel}
 	for _, level := range levels {
 		withLogger(t, DebugLevel, []Option{AddCaller()}, func(l *Logger, logs *observer.ObservedLogs) {
 			std, err := NewStdLogAt(l, level)
@@ -117,7 +117,7 @@ func TestNewStdLogAt(t *testing.T) {
 
 func TestNewStdLogAtPanics(t *testing.T) {
 	// include DPanicLevel here and enable Development in options
-	levels := []zapcore.Level{DPanicLevel, PanicLevel}
+	levels := []ladcore.Level{DPanicLevel, PanicLevel}
 	for _, level := range levels {
 		withLogger(t, DebugLevel, []Option{AddCaller(), Development()}, func(l *Logger, logs *observer.ObservedLogs) {
 			std, err := NewStdLogAt(l, level)
@@ -142,7 +142,7 @@ func TestNewStdLogAtFatal(t *testing.T) {
 }
 
 func TestNewStdLogAtInvalid(t *testing.T) {
-	_, err := NewStdLogAt(NewNop(), zapcore.Level(99))
+	_, err := NewStdLogAt(NewNop(), ladcore.Level(99))
 	assert.ErrorContains(t, err, "99", "Expected level code in error message")
 }
 
@@ -155,7 +155,7 @@ func TestRedirectStdLog(t *testing.T) {
 		log.Print("redirected")
 
 		assert.Equal(t, []observer.LoggedEntry{{
-			Entry:   zapcore.Entry{Message: "redirected"},
+			Entry:   ladcore.Entry{Message: "redirected"},
 			Context: []Field{},
 		}}, logs.AllUntimed(), "Unexpected global log output.")
 	})
@@ -179,7 +179,7 @@ func TestRedirectStdLogAt(t *testing.T) {
 	initialPrefix := log.Prefix()
 
 	// include DPanicLevel here, but do not include Development in options
-	levels := []zapcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel}
+	levels := []ladcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel}
 	for _, level := range levels {
 		withLogger(t, DebugLevel, nil, func(l *Logger, logs *observer.ObservedLogs) {
 			restore, err := RedirectStdLogAt(l, level)
@@ -188,7 +188,7 @@ func TestRedirectStdLogAt(t *testing.T) {
 			log.Print("redirected")
 
 			assert.Equal(t, []observer.LoggedEntry{{
-				Entry:   zapcore.Entry{Level: level, Message: "redirected"},
+				Entry:   ladcore.Entry{Level: level, Message: "redirected"},
 				Context: []Field{},
 			}}, logs.AllUntimed(), "Unexpected global log output.")
 		})
@@ -200,7 +200,7 @@ func TestRedirectStdLogAt(t *testing.T) {
 
 func TestRedirectStdLogAtCaller(t *testing.T) {
 	// include DPanicLevel here, but do not include Development in options
-	levels := []zapcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel}
+	levels := []ladcore.Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, DPanicLevel}
 	for _, level := range levels {
 		withLogger(t, DebugLevel, []Option{AddCaller()}, func(l *Logger, logs *observer.ObservedLogs) {
 			restore, err := RedirectStdLogAt(l, level)
@@ -219,7 +219,7 @@ func TestRedirectStdLogAtPanics(t *testing.T) {
 	initialPrefix := log.Prefix()
 
 	// include DPanicLevel here and enable Development in options
-	levels := []zapcore.Level{DPanicLevel, PanicLevel}
+	levels := []ladcore.Level{DPanicLevel, PanicLevel}
 	for _, level := range levels {
 		withLogger(t, DebugLevel, []Option{AddCaller(), Development()}, func(l *Logger, logs *observer.ObservedLogs) {
 			restore, err := RedirectStdLogAt(l, level)
@@ -255,7 +255,7 @@ func TestRedirectStdLogAtFatal(t *testing.T) {
 }
 
 func TestRedirectStdLogAtInvalid(t *testing.T) {
-	restore, err := RedirectStdLogAt(NewNop(), zapcore.Level(99))
+	restore, err := RedirectStdLogAt(NewNop(), ladcore.Level(99))
 	defer func() {
 		if restore != nil {
 			restore()

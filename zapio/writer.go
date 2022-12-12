@@ -25,7 +25,7 @@ import (
 	"io"
 
 	zap "github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 // Writer is an io.Writer that writes to the provided Zap logger, splitting log
@@ -56,13 +56,13 @@ type Writer struct {
 	// Log level for the messages written to the provided logger.
 	//
 	// If unspecified, defaults to Info.
-	Level zapcore.Level
+	Level ladcore.Level
 
 	buff bytes.Buffer
 }
 
 var (
-	_ zapcore.WriteSyncer = (*Writer)(nil)
+	_ ladcore.WriteSyncer = (*Writer)(nil)
 	_ io.Closer           = (*Writer)(nil)
 )
 

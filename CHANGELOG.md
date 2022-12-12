@@ -19,7 +19,7 @@ contributions to this release.
 ## 1.23.0 (24 Aug 2022)
 
 Enhancements:
-* [#1147][]: Add a `zapcore.LevelOf` function to determine the level of a
+* [#1147][]: Add a `ladcore.LevelOf` function to determine the level of a
   `LevelEnabler` or `Core`.
 * [#1155][]: Add `zap.Stringers` field constructor to log arrays of objects
   that implement `String() string`.
@@ -33,8 +33,8 @@ Enhancements:
 Enhancements:
 * [#1071][]: Add `zap.Objects` and `zap.ObjectValues` field constructors to log
   arrays of objects. With these two constructors, you don't need to implement
-  `zapcore.ArrayMarshaler` for use with `zap.Array` if those objects implement
-  `zapcore.ObjectMarshaler`.
+  `ladcore.ArrayMarshaler` for use with `zap.Array` if those objects implement
+  `ladcore.ObjectMarshaler`.
 * [#1079][]: Add `SugaredLogger.WithOptions` to build a copy of an existing
   `SugaredLogger` with the provided options applied.
 * [#1080][]: Add `*ln` variants to `SugaredLogger` for each log level.
@@ -59,7 +59,7 @@ for their contributions to this release.
 ## 1.21.0 (7 Feb 2022)
 
 Enhancements:
-*  [#1047][]: Add `zapcore.ParseLevel` to parse a `Level` from a string.
+*  [#1047][]: Add `ladcore.ParseLevel` to parse a `Level` from a string.
 *  [#1048][]: Add `zap.ParseAtomicLevel` to parse an `AtomicLevel` from a
    string.
 
@@ -135,11 +135,11 @@ Bugfixes:
 ## 1.18.0 (28 Jun 2021)
 
 Enhancements:
-* [#961][]: Add `zapcore.BufferedWriteSyncer`, a new `WriteSyncer` that buffers
+* [#961][]: Add `ladcore.BufferedWriteSyncer`, a new `WriteSyncer` that buffers
   messages in-memory and flushes them periodically.
 * [#971][]: Add `zapio.Writer` to use a Zap logger as an `io.Writer`.
 * [#897][]: Add `zap.WithClock` option to control the source of time via the
-  new `zapcore.Clock` interface.
+  new `ladcore.Clock` interface.
 * [#949][]: Avoid panicking in `zap.SugaredLogger` when arguments of `*w`
   methods don't match expectations.
 * [#943][]: Add support for filtering by level or arbitrary matcher function to
@@ -187,7 +187,7 @@ Bugfixes:
 * [#854][]: Encode `<nil>` for nil `Stringer` instead of a panic error log.
 
 Enhancements:
-* [#629][]: Added `zapcore.TimeEncoderOfLayout` to easily create time encoders
+* [#629][]: Added `ladcore.TimeEncoderOfLayout` to easily create time encoders
   for custom layouts.
 * [#697][]: Added support for a configurable delimiter in the console encoder.
 * [#852][]: Optimize console encoder by pooling the underlying JSON encoder.
@@ -251,7 +251,7 @@ Enhancements:
 ## 1.11.0 (21 Oct 2019)
 
 Enhancements:
-* [#725][]: Add `zapcore.OmitKey` to omit keys in an `EncoderConfig`.
+* [#725][]: Add `ladcore.OmitKey` to omit keys in an `EncoderConfig`.
 * [#736][]: Add `RFC3339` and `RFC3339Nano` time encoders.
 
 Thanks to @juicemia, @uhthomas for their contributions to this release.
@@ -294,7 +294,7 @@ Enhancements:
 * [#508][]: Make log level configurable when redirecting the standard
   library's logger.
 * [#518][]: Add a logger that writes to a `*testing.TB`.
-* [#577][]: Add a top-level alias for `zapcore.Field` to clean up GoDoc.
+* [#577][]: Add a top-level alias for `ladcore.Field` to clean up GoDoc.
 
 Bugfixes:
 * [#574][]: Add a missing import comment to `github.com/tnngo/lad/buffer`.
@@ -402,7 +402,7 @@ Breaking changes:
 
 * [#366][]: Add byte-oriented APIs to encoders to log UTF-8 encoded text without
   casting from `[]byte` to `string`.
-* [#364][]: To support buffering outputs, add `Sync` methods to `zapcore.Core`,
+* [#364][]: To support buffering outputs, add `Sync` methods to `ladcore.Core`,
   `zap.Logger`, and `zap.SugaredLogger`.
 * [#371][]: Rename the `testutils` package to `zaptest`, which is less likely to
   clash with other testing helpers.
@@ -411,7 +411,7 @@ Bugfixes:
 
 * [#362][]: Make the ISO8601 time formatters fixed-width, which is friendlier
   for tab-separated console output.
-* [#369][]: Remove the automatic locks in `zapcore.NewCore`, which allows zap to
+* [#369][]: Remove the automatic locks in `ladcore.NewCore`, which allows zap to
   work with concurrency-safe `WriteSyncer` implementations.
 * [#347][]: Stop reporting errors when trying to `fsync` standard out on Linux
   systems.
@@ -503,8 +503,8 @@ breaking changes and improvements from the pre-release version. Most notably:
 * **Zap's import path is now "github.com/tnngo/lad"** &mdash; all users will
   need to update their code.
 * User-facing types and functions remain in the `zap` package. Code relevant
-  largely to extension authors is now in the `zapcore` package.
-* The `zapcore.Core` type makes it easy for third-party packages to use zap's
+  largely to extension authors is now in the `ladcore` package.
+* The `ladcore.Core` type makes it easy for third-party packages to use zap's
   internals but provide a different user-facing API.
 * `Logger` is now a concrete type instead of an interface.
 * A less verbose (though slower) logging API is included by default.

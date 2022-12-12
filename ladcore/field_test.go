@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore_test
+package ladcore_test
 
 import (
 	"errors"
@@ -31,7 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	zap "github.com/tnngo/lad"
-	. "github.com/tnngo/lad/zapcore"
+	. "github.com/tnngo/lad/ladcore"
 )
 
 type users int
@@ -112,7 +112,7 @@ func TestFieldAddingError(t *testing.T) {
 		{t: ArrayMarshalerType, iface: users(-1), want: []interface{}{}, err: "too few users"},
 		{t: ObjectMarshalerType, iface: users(-1), want: map[string]interface{}{}, err: "too few users"},
 		{t: InlineMarshalerType, iface: users(-1), want: nil, err: "too few users"},
-		{t: StringerType, iface: obj{}, want: empty, err: "PANIC=interface conversion: zapcore_test.obj is not fmt.Stringer: missing method String"},
+		{t: StringerType, iface: obj{}, want: empty, err: "PANIC=interface conversion: ladcore_test.obj is not fmt.Stringer: missing method String"},
 		{t: StringerType, iface: &obj{1}, want: empty, err: "PANIC=panic with string"},
 		{t: StringerType, iface: &obj{2}, want: empty, err: "PANIC=panic with error"},
 		{t: StringerType, iface: &obj{3}, want: empty, err: "PANIC=<nil>"},

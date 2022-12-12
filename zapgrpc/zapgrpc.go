@@ -25,7 +25,7 @@ import (
 	"fmt"
 
 	zap "github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 // See https://github.com/grpc/grpc-go/blob/v1.35.0/grpclog/loggerv2.go#L77-L86
@@ -38,12 +38,12 @@ const (
 
 var (
 	// _grpcToZapLevel maps gRPC log levels to zap log levels.
-	// See https://pkg.go.dev/github.com/tnngo/lad@v1.16.0/zapcore#Level
-	_grpcToZapLevel = map[int]zapcore.Level{
-		grpcLvlInfo:  zapcore.InfoLevel,
-		grpcLvlWarn:  zapcore.WarnLevel,
-		grpcLvlError: zapcore.ErrorLevel,
-		grpcLvlFatal: zapcore.FatalLevel,
+	// See https://pkg.go.dev/github.com/tnngo/lad@v1.16.0/ladcore#Level
+	_grpcToZapLevel = map[int]ladcore.Level{
+		grpcLvlInfo:  ladcore.InfoLevel,
+		grpcLvlWarn:  ladcore.WarnLevel,
+		grpcLvlError: ladcore.ErrorLevel,
+		grpcLvlFatal: ladcore.FatalLevel,
 	}
 )
 
@@ -67,7 +67,7 @@ func WithDebug() Option {
 	return optionFunc(func(logger *Logger) {
 		logger.print = &printer{
 			enab:   logger.levelEnabler,
-			level:  zapcore.DebugLevel,
+			level:  ladcore.DebugLevel,
 			print:  logger.delegate.Debug,
 			printf: logger.delegate.Debugf,
 		}
@@ -80,7 +80,7 @@ func withWarn() Option {
 	return optionFunc(func(logger *Logger) {
 		logger.fatal = &printer{
 			enab:   logger.levelEnabler,
-			level:  zapcore.WarnLevel,
+			level:  ladcore.WarnLevel,
 			print:  logger.delegate.Warn,
 			printf: logger.delegate.Warnf,
 		}
@@ -95,13 +95,13 @@ func NewLogger(l *zap.Logger, options ...Option) *Logger {
 	}
 	logger.print = &printer{
 		enab:   logger.levelEnabler,
-		level:  zapcore.InfoLevel,
+		level:  ladcore.InfoLevel,
 		print:  logger.delegate.Info,
 		printf: logger.delegate.Infof,
 	}
 	logger.fatal = &printer{
 		enab:   logger.levelEnabler,
-		level:  zapcore.FatalLevel,
+		level:  ladcore.FatalLevel,
 		print:  logger.delegate.Fatal,
 		printf: logger.delegate.Fatalf,
 	}
@@ -116,8 +116,8 @@ func NewLogger(l *zap.Logger, options ...Option) *Logger {
 // We use it to customize Debug vs Info, and Warn vs Fatal for Print and Fatal
 // respectively.
 type printer struct {
-	enab   zapcore.LevelEnabler
-	level  zapcore.Level
+	enab   ladcore.LevelEnabler
+	level  ladcore.Level
 	print  func(...interface{})
 	printf func(string, ...interface{})
 }
@@ -139,7 +139,7 @@ func (v *printer) Println(args ...interface{}) {
 // Logger adapts zap's Logger to be compatible with grpclog.LoggerV2 and the deprecated grpclog.Logger.
 type Logger struct {
 	delegate     *zap.SugaredLogger
-	levelEnabler zapcore.LevelEnabler
+	levelEnabler ladcore.LevelEnabler
 	print        *printer
 	fatal        *printer
 	// printToDebug bool
@@ -174,7 +174,7 @@ func (l *Logger) Info(args ...interface{}) {
 
 // Infoln implements grpclog.LoggerV2.
 func (l *Logger) Infoln(args ...interface{}) {
-	if l.levelEnabler.Enabled(zapcore.InfoLevel) {
+	if l.levelEnabler.Enabled(ladcore.InfoLevel) {
 		l.delegate.Info(sprintln(args))
 	}
 }
@@ -191,7 +191,7 @@ func (l *Logger) Warning(args ...interface{}) {
 
 // Warningln implements grpclog.LoggerV2.
 func (l *Logger) Warningln(args ...interface{}) {
-	if l.levelEnabler.Enabled(zapcore.WarnLevel) {
+	if l.levelEnabler.Enabled(ladcore.WarnLevel) {
 		l.delegate.Warn(sprintln(args))
 	}
 }
@@ -208,7 +208,7 @@ func (l *Logger) Error(args ...interface{}) {
 
 // Errorln implements grpclog.LoggerV2.
 func (l *Logger) Errorln(args ...interface{}) {
-	if l.levelEnabler.Enabled(zapcore.ErrorLevel) {
+	if l.levelEnabler.Enabled(ladcore.ErrorLevel) {
 		l.delegate.Error(sprintln(args))
 	}
 }

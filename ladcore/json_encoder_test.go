@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore_test
+package ladcore_test
 
 import (
 	"io"
@@ -28,13 +28,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	zap "github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 // TestJSONEncodeEntry is an more "integrated" test that makes it easier to get
 // coverage on the json encoder (e.g. putJSONEncoder, let alone EncodeEntry
 // itself) than the tests in json_encoder_impl_test.go; it needs to be in the
-// zapcore_test package, so that it can import the toplevel zap package for
+// ladcore_test package, so that it can import the toplevel zap package for
 // field constructor convenience.
 func TestJSONEncodeEntry(t *testing.T) {
 	type bar struct {
@@ -52,8 +52,8 @@ func TestJSONEncodeEntry(t *testing.T) {
 	tests := []struct {
 		desc     string
 		expected string
-		ent      zapcore.Entry
-		fields   []zapcore.Field
+		ent      ladcore.Entry
+		fields   []ladcore.Field
 	}{
 		{
 			desc: "info entry with some fields",
@@ -79,13 +79,13 @@ func TestJSONEncodeEntry(t *testing.T) {
 					]
 				}
 			}`,
-			ent: zapcore.Entry{
-				Level:      zapcore.InfoLevel,
+			ent: ladcore.Entry{
+				Level:      ladcore.InfoLevel,
 				Time:       time.Date(2018, 6, 19, 16, 33, 42, 99, time.UTC),
 				LoggerName: "bob",
 				Message:    "lob law",
 			},
-			fields: []zapcore.Field{
+			fields: []ladcore.Field{
 				zap.String("so", "passes"),
 				zap.Int("answer", 42),
 				zap.Float64("common_pie", 3.14),
@@ -111,7 +111,7 @@ func TestJSONEncodeEntry(t *testing.T) {
 		},
 	}
 
-	enc := zapcore.NewJSONEncoder(zapcore.EncoderConfig{
+	enc := ladcore.NewJSONEncoder(ladcore.EncoderConfig{
 		MessageKey:     "M",
 		LevelKey:       "L",
 		TimeKey:        "T",
@@ -119,10 +119,10 @@ func TestJSONEncodeEntry(t *testing.T) {
 		CallerKey:      "C",
 		FunctionKey:    "F",
 		StacktraceKey:  "S",
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
+		EncodeLevel:    ladcore.LowercaseLevelEncoder,
+		EncodeTime:     ladcore.ISO8601TimeEncoder,
+		EncodeDuration: ladcore.SecondsDurationEncoder,
+		EncodeCaller:   ladcore.ShortCallerEncoder,
 	})
 
 	for _, tt := range tests {
@@ -137,7 +137,7 @@ func TestJSONEncodeEntry(t *testing.T) {
 }
 
 func TestNoEncodeLevelSupplied(t *testing.T) {
-	enc := zapcore.NewJSONEncoder(zapcore.EncoderConfig{
+	enc := ladcore.NewJSONEncoder(ladcore.EncoderConfig{
 		MessageKey:     "M",
 		LevelKey:       "L",
 		TimeKey:        "T",
@@ -145,19 +145,19 @@ func TestNoEncodeLevelSupplied(t *testing.T) {
 		CallerKey:      "C",
 		FunctionKey:    "F",
 		StacktraceKey:  "S",
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
+		EncodeTime:     ladcore.ISO8601TimeEncoder,
+		EncodeDuration: ladcore.SecondsDurationEncoder,
+		EncodeCaller:   ladcore.ShortCallerEncoder,
 	})
 
-	ent := zapcore.Entry{
-		Level:      zapcore.InfoLevel,
+	ent := ladcore.Entry{
+		Level:      ladcore.InfoLevel,
 		Time:       time.Date(2018, 6, 19, 16, 33, 42, 99, time.UTC),
 		LoggerName: "bob",
 		Message:    "lob law",
 	}
 
-	fields := []zapcore.Field{
+	fields := []ladcore.Field{
 		zap.Int("answer", 42),
 	}
 
@@ -168,7 +168,7 @@ func TestNoEncodeLevelSupplied(t *testing.T) {
 func TestJSONEmptyConfig(t *testing.T) {
 	tests := []struct {
 		name     string
-		field    zapcore.Field
+		field    ladcore.Field
 		expected string
 	}{
 		{
@@ -185,14 +185,14 @@ func TestJSONEmptyConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			enc := zapcore.NewJSONEncoder(zapcore.EncoderConfig{})
+			enc := ladcore.NewJSONEncoder(ladcore.EncoderConfig{})
 
-			buf, err := enc.EncodeEntry(zapcore.Entry{
-				Level:      zapcore.DebugLevel,
+			buf, err := enc.EncodeEntry(ladcore.Entry{
+				Level:      ladcore.DebugLevel,
 				Time:       time.Now(),
 				LoggerName: "mylogger",
 				Message:    "things happened",
-			}, []zapcore.Field{tt.field})
+			}, []ladcore.Field{tt.field})
 			if assert.NoError(t, err, "Unexpected JSON encoding error.") {
 				assert.JSONEq(t, tt.expected, buf.String(), "Incorrect encoded JSON entry.")
 			}
@@ -215,14 +215,14 @@ func (enc *emptyReflectedEncoder) Encode(obj interface{}) error {
 func TestJSONCustomReflectedEncoder(t *testing.T) {
 	tests := []struct {
 		name     string
-		field    zapcore.Field
+		field    ladcore.Field
 		expected string
 	}{
 		{
 			name: "encode custom map object",
-			field: zapcore.Field{
+			field: ladcore.Field{
 				Key:  "data",
-				Type: zapcore.ReflectType,
+				Type: ladcore.ReflectType,
 				Interface: map[string]interface{}{
 					"foo": "hello",
 					"bar": 1111,
@@ -232,9 +232,9 @@ func TestJSONCustomReflectedEncoder(t *testing.T) {
 		},
 		{
 			name: "encode nil object",
-			field: zapcore.Field{
+			field: ladcore.Field{
 				Key:  "data",
-				Type: zapcore.ReflectType,
+				Type: ladcore.ReflectType,
 			},
 			expected: `{"data":null}`,
 		},
@@ -245,20 +245,20 @@ func TestJSONCustomReflectedEncoder(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			enc := zapcore.NewJSONEncoder(zapcore.EncoderConfig{
-				NewReflectedEncoder: func(writer io.Writer) zapcore.ReflectedEncoder {
+			enc := ladcore.NewJSONEncoder(ladcore.EncoderConfig{
+				NewReflectedEncoder: func(writer io.Writer) ladcore.ReflectedEncoder {
 					return &emptyReflectedEncoder{
 						writer: writer,
 					}
 				},
 			})
 
-			buf, err := enc.EncodeEntry(zapcore.Entry{
-				Level:      zapcore.DebugLevel,
+			buf, err := enc.EncodeEntry(ladcore.Entry{
+				Level:      ladcore.DebugLevel,
 				Time:       time.Now(),
 				LoggerName: "logger",
 				Message:    "things happened",
-			}, []zapcore.Field{tt.field})
+			}, []ladcore.Field{tt.field})
 			if assert.NoError(t, err, "Unexpected JSON encoding error.") {
 				assert.JSONEq(t, tt.expected, buf.String(), "Incorrect encoded JSON entry.")
 			}

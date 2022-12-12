@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore
+package ladcore
 
 // Core is a minimal, fast logger interface. It's designed for library authors
 // to wrap in a more user-friendly API.

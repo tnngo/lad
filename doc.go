@@ -95,20 +95,20 @@
 //
 // More unusual configurations (splitting output between files, sending logs
 // to a message queue, etc.) are possible, but require direct use of
-// github.com/tnngo/lad/zapcore. See the package-level AdvancedConfiguration
+// github.com/tnngo/lad/ladcore. See the package-level AdvancedConfiguration
 // example for sample code.
 //
 // # Extending Zap
 //
 // The zap package itself is a relatively thin wrapper around the interfaces
-// in github.com/tnngo/lad/zapcore. Extending zap to support a new encoding (e.g.,
+// in github.com/tnngo/lad/ladcore. Extending zap to support a new encoding (e.g.,
 // BSON), a new log sink (e.g., Kafka), or something more exotic (perhaps an
 // exception aggregation service, like Sentry or Rollbar) typically requires
-// implementing the zapcore.Encoder, zapcore.WriteSyncer, or zapcore.Core
-// interfaces. See the zapcore documentation for details.
+// implementing the ladcore.Encoder, ladcore.WriteSyncer, or ladcore.Core
+// interfaces. See the ladcore documentation for details.
 //
 // Similarly, package authors can use the high-performance Encoder and Core
-// implementations in the zapcore package to build their own loggers.
+// implementations in the ladcore package to build their own loggers.
 //
 // # Frequently Asked Questions
 //

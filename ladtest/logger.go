@@ -24,7 +24,7 @@ import (
 	"bytes"
 
 	zap "github.com/tnngo/lad"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 // LoggerOption configures the test logger built by NewLogger.
@@ -33,7 +33,7 @@ type LoggerOption interface {
 }
 
 type loggerOptions struct {
-	Level      zapcore.LevelEnabler
+	Level      ladcore.LevelEnabler
 	zapOptions []zap.Option
 }
 
@@ -45,7 +45,7 @@ func (f loggerOptionFunc) applyLoggerOption(opts *loggerOptions) {
 
 // Level controls which messages are logged by a test Logger built by
 // NewLogger.
-func Level(enab zapcore.LevelEnabler) LoggerOption {
+func Level(enab ladcore.LevelEnabler) LoggerOption {
 	return loggerOptionFunc(func(opts *loggerOptions) {
 		opts.Level = enab
 	})
@@ -76,7 +76,7 @@ func WrapOptions(zapOpts ...zap.Option) LoggerOption {
 //	logger := zaptest.NewLogger(t, zaptest.WrapOptions(zap.AddCaller()))
 func NewLogger(t TestingT, opts ...LoggerOption) *zap.Logger {
 	cfg := loggerOptions{
-		Level: zapcore.DebugLevel,
+		Level: ladcore.DebugLevel,
 	}
 	for _, o := range opts {
 		o.applyLoggerOption(&cfg)
@@ -91,8 +91,8 @@ func NewLogger(t TestingT, opts ...LoggerOption) *zap.Logger {
 	zapOptions = append(zapOptions, cfg.zapOptions...)
 
 	return zap.New(
-		zapcore.NewCore(
-			zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
+		ladcore.NewCore(
+			ladcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
 			writer,
 			cfg.Level,
 		),

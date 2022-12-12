@@ -25,14 +25,14 @@ import (
 	"io"
 	"testing"
 
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
 )
 
 type flagTestCase struct {
 	args      []string
-	wantLevel zapcore.Level
+	wantLevel ladcore.Level
 	wantErr   bool
 }
 
@@ -47,13 +47,13 @@ func (tc flagTestCase) runImplicitSet(t testing.TB) {
 }
 
 func (tc flagTestCase) runExplicitSet(t testing.TB) {
-	var lvl zapcore.Level
+	var lvl ladcore.Level
 	set := flag.NewFlagSet("test", flag.ContinueOnError)
 	set.Var(&lvl, "level", "minimum enabled logging level")
 	tc.run(t, set, &lvl)
 }
 
-func (tc flagTestCase) run(t testing.TB, set *flag.FlagSet, actual *zapcore.Level) {
+func (tc flagTestCase) run(t testing.TB, set *flag.FlagSet, actual *ladcore.Level) {
 	err := set.Parse(tc.args)
 	if tc.wantErr {
 		assert.Error(t, err, "Parse(%v) should fail.", tc.args)
@@ -68,7 +68,7 @@ func TestLevelFlag(t *testing.T) {
 	tests := []flagTestCase{
 		{
 			args:      nil,
-			wantLevel: zapcore.InfoLevel,
+			wantLevel: ladcore.InfoLevel,
 		},
 		{
 			args:    []string{"--level", "unknown"},
@@ -76,7 +76,7 @@ func TestLevelFlag(t *testing.T) {
 		},
 		{
 			args:      []string{"--level", "error"},
-			wantLevel: zapcore.ErrorLevel,
+			wantLevel: ladcore.ErrorLevel,
 		},
 	}
 

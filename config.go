@@ -25,7 +25,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 // SamplingConfig sets a sampling strategy for the logger. Sampling caps the
@@ -34,23 +34,23 @@ import (
 //
 // If specified, the Sampler will invoke the Hook after each decision.
 //
-// Values configured here are per-second. See zapcore.NewSamplerWithOptions for
+// Values configured here are per-second. See ladcore.NewSamplerWithOptions for
 // details.
 type SamplingConfig struct {
 	Initial    int                                           `json:"initial" yaml:"initial"`
 	Thereafter int                                           `json:"thereafter" yaml:"thereafter"`
-	Hook       func(zapcore.Entry, zapcore.SamplingDecision) `json:"-" yaml:"-"`
+	Hook       func(ladcore.Entry, ladcore.SamplingDecision) `json:"-" yaml:"-"`
 }
 
 // Config offers a declarative way to construct a logger. It doesn't do
 // anything that can't be done with New, Options, and the various
-// zapcore.WriteSyncer and zapcore.Core wrappers, but it's a simpler way to
+// ladcore.WriteSyncer and ladcore.Core wrappers, but it's a simpler way to
 // toggle common options.
 //
 // Note that Config intentionally supports only the most common options. More
 // unusual logging setups (logging to network connections or message queues,
 // splitting output between multiple files, etc.) are possible, but require
-// direct use of the zapcore package. For sample code, see the package-level
+// direct use of the ladcore package. For sample code, see the package-level
 // BasicConfiguration and AdvancedConfiguration examples.
 //
 // For an example showing runtime log level changes, see the documentation for
@@ -77,8 +77,8 @@ type Config struct {
 	// RegisterEncoder.
 	Encoding string `json:"encoding" yaml:"encoding"`
 	// EncoderConfig sets options for the chosen encoder. See
-	// zapcore.EncoderConfig for details.
-	EncoderConfig zapcore.EncoderConfig `json:"encoderConfig" yaml:"encoderConfig"`
+	// ladcore.EncoderConfig for details.
+	EncoderConfig ladcore.EncoderConfig `json:"encoderConfig" yaml:"encoderConfig"`
 	// OutputPaths is a list of URLs or file paths to write logging output to.
 	// See Open for details.
 	OutputPaths []string `json:"outputPaths" yaml:"outputPaths"`
@@ -95,20 +95,20 @@ type Config struct {
 
 // NewProductionEncoderConfig returns an opinionated EncoderConfig for
 // production environments.
-func NewProductionEncoderConfig() zapcore.EncoderConfig {
-	return zapcore.EncoderConfig{
+func NewProductionEncoderConfig() ladcore.EncoderConfig {
+	return ladcore.EncoderConfig{
 		TimeKey:        "ts",
 		LevelKey:       "level",
 		NameKey:        "logger",
 		CallerKey:      "caller",
-		FunctionKey:    zapcore.OmitKey,
+		FunctionKey:    ladcore.OmitKey,
 		MessageKey:     "msg",
 		StacktraceKey:  "stacktrace",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.EpochTimeEncoder,
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
+		LineEnding:     ladcore.DefaultLineEnding,
+		EncodeLevel:    ladcore.LowercaseLevelEncoder,
+		EncodeTime:     ladcore.EpochTimeEncoder,
+		EncodeDuration: ladcore.SecondsDurationEncoder,
+		EncodeCaller:   ladcore.ShortCallerEncoder,
 	}
 }
 
@@ -134,21 +134,21 @@ func NewProductionConfig() Config {
 
 // NewDevelopmentEncoderConfig returns an opinionated EncoderConfig for
 // development environments.
-func NewDevelopmentEncoderConfig() zapcore.EncoderConfig {
-	return zapcore.EncoderConfig{
+func NewDevelopmentEncoderConfig() ladcore.EncoderConfig {
+	return ladcore.EncoderConfig{
 		// Keys can be anything except the empty string.
 		TimeKey:        "T",
 		LevelKey:       "L",
 		NameKey:        "N",
 		CallerKey:      "C",
-		FunctionKey:    zapcore.OmitKey,
+		FunctionKey:    ladcore.OmitKey,
 		MessageKey:     "M",
 		StacktraceKey:  "S",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.CapitalLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
-		EncodeDuration: zapcore.StringDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
+		LineEnding:     ladcore.DefaultLineEnding,
+		EncodeLevel:    ladcore.CapitalLevelEncoder,
+		EncodeTime:     ladcore.ISO8601TimeEncoder,
+		EncodeDuration: ladcore.StringDurationEncoder,
+		EncodeCaller:   ladcore.ShortCallerEncoder,
 	}
 }
 
@@ -186,7 +186,7 @@ func (cfg Config) Build(opts ...Option) (*Logger, error) {
 	}
 
 	log := New(
-		zapcore.NewCore(enc, sink, cfg.Level),
+		ladcore.NewCore(enc, sink, cfg.Level),
 		cfg.buildOptions(errSink)...,
 	)
 	if len(opts) > 0 {
@@ -195,7 +195,7 @@ func (cfg Config) Build(opts ...Option) (*Logger, error) {
 	return log, nil
 }
 
-func (cfg Config) buildOptions(errSink zapcore.WriteSyncer) []Option {
+func (cfg Config) buildOptions(errSink ladcore.WriteSyncer) []Option {
 	opts := []Option{ErrorOutput(errSink)}
 
 	if cfg.Development {
@@ -215,12 +215,12 @@ func (cfg Config) buildOptions(errSink zapcore.WriteSyncer) []Option {
 	}
 
 	if scfg := cfg.Sampling; scfg != nil {
-		opts = append(opts, WrapCore(func(core zapcore.Core) zapcore.Core {
-			var samplerOpts []zapcore.SamplerOption
+		opts = append(opts, WrapCore(func(core ladcore.Core) ladcore.Core {
+			var samplerOpts []ladcore.SamplerOption
 			if scfg.Hook != nil {
-				samplerOpts = append(samplerOpts, zapcore.SamplerHook(scfg.Hook))
+				samplerOpts = append(samplerOpts, ladcore.SamplerHook(scfg.Hook))
 			}
-			return zapcore.NewSamplerWithOptions(
+			return ladcore.NewSamplerWithOptions(
 				core,
 				time.Second,
 				cfg.Sampling.Initial,
@@ -246,7 +246,7 @@ func (cfg Config) buildOptions(errSink zapcore.WriteSyncer) []Option {
 	return opts
 }
 
-func (cfg Config) openSinks() (zapcore.WriteSyncer, zapcore.WriteSyncer, error) {
+func (cfg Config) openSinks() (ladcore.WriteSyncer, ladcore.WriteSyncer, error) {
 	sink, closeOut, err := Open(cfg.OutputPaths...)
 	if err != nil {
 		return nil, nil, err
@@ -259,6 +259,6 @@ func (cfg Config) openSinks() (zapcore.WriteSyncer, zapcore.WriteSyncer, error) 
 	return sink, errSink, nil
 }
 
-func (cfg Config) buildEncoder() (zapcore.Encoder, error) {
+func (cfg Config) buildEncoder() (ladcore.Encoder, error) {
 	return newEncoder(cfg.Encoding, cfg.EncoderConfig)
 }

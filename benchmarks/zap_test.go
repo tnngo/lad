@@ -27,7 +27,7 @@ import (
 
 	"github.com/tnngo/lad"
 	"github.com/tnngo/lad/internal/ztest"
-	"github.com/tnngo/lad/zapcore"
+	"github.com/tnngo/lad/ladcore"
 	"go.uber.org/multierr"
 )
 
@@ -82,7 +82,7 @@ func getMessage(iter int) string {
 
 type users []*user
 
-func (uu users) MarshalLogArray(arr zapcore.ArrayEncoder) error {
+func (uu users) MarshalLogArray(arr ladcore.ArrayEncoder) error {
 	var err error
 	for i := range uu {
 		err = multierr.Append(err, arr.AppendObject(uu[i]))
@@ -96,27 +96,27 @@ type user struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (u *user) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+func (u *user) MarshalLogObject(enc ladcore.ObjectEncoder) error {
 	enc.AddString("name", u.Name)
 	enc.AddString("email", u.Email)
 	enc.AddInt64("createdAt", u.CreatedAt.UnixNano())
 	return nil
 }
 
-func newZapLogger(lvl zapcore.Level) *zap.Logger {
+func newZapLogger(lvl ladcore.Level) *zap.Logger {
 	ec := zap.NewProductionEncoderConfig()
-	ec.EncodeDuration = zapcore.NanosDurationEncoder
-	ec.EncodeTime = zapcore.EpochNanosTimeEncoder
-	enc := zapcore.NewJSONEncoder(ec)
-	return zap.New(zapcore.NewCore(
+	ec.EncodeDuration = ladcore.NanosDurationEncoder
+	ec.EncodeTime = ladcore.EpochNanosTimeEncoder
+	enc := ladcore.NewJSONEncoder(ec)
+	return zap.New(ladcore.NewCore(
 		enc,
 		&ztest.Discarder{},
 		lvl,
 	))
 }
 
-func newSampledLogger(lvl zapcore.Level) *zap.Logger {
-	return zap.New(zapcore.NewSamplerWithOptions(
+func newSampledLogger(lvl ladcore.Level) *zap.Logger {
+	return zap.New(ladcore.NewSamplerWithOptions(
 		newZapLogger(zap.DebugLevel).Core(),
 		100*time.Millisecond,
 		10, // first

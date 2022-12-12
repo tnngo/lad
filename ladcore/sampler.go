@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zapcore
+package ladcore
 
 import (
 	"time"
@@ -114,8 +114,8 @@ func nopSamplingHook(Entry, SamplingDecision) {}
 // For example, use it to track metrics of dropped versus sampled logs.
 //
 //	var dropped atomic.Int64
-//	zapcore.SamplerHook(func(ent zapcore.Entry, dec zapcore.SamplingDecision) {
-//	  if dec&zapcore.LogDropped > 0 {
+//	ladcore.SamplerHook(func(ent ladcore.Entry, dec ladcore.SamplingDecision) {
+//	  if dec&ladcore.LogDropped > 0 {
 //	    dropped.Inc()
 //	  }
 //	})
