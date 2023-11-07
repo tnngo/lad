@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// readme generates Zap's README from a template.
 package main
 
 import (
@@ -34,18 +35,18 @@ import (
 	"time"
 )
 
-var (
-	libraryNameToMarkdownName = map[string]string{
-		"Zap":                   ":zap: zap",
-		"Zap.Sugar":             ":zap: zap (sugared)",
-		"stdlib.Println":        "standard library",
-		"sirupsen/logrus":       "logrus",
-		"go-kit/kit/log":        "go-kit",
-		"inconshreveable/log15": "log15",
-		"apex/log":              "apex/log",
-		"rs/zerolog":            "zerolog",
-	}
-)
+var libraryNameToMarkdownName = map[string]string{
+	"Zap":                   ":zap: zap",
+	"Zap.Sugar":             ":zap: zap (sugared)",
+	"stdlib.Println":        "standard library",
+	"sirupsen/logrus":       "logrus",
+	"go-kit/kit/log":        "go-kit",
+	"inconshreveable/log15": "log15",
+	"apex/log":              "apex/log",
+	"rs/zerolog":            "zerolog",
+	"slog":                  "slog",
+	"slog.LogAttrs":         "slog (LogAttrs)",
+}
 
 func main() {
 	flag.Parse()

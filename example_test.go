@@ -27,14 +27,14 @@ import (
 	"os"
 	"time"
 
-	zap "github.com/tnngo/lad"
+	"github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
 )
 
 func Example_presets() {
-	// Using zap's preset constructors is the simplest way to get a feel for the
+	// Using lad's preset constructors is the simplest way to get a feel for the
 	// package, but they don't allow much customization.
-	logger := zap.NewExample() // or NewProduction, or NewDevelopment
+	logger := lad.NewExample() // or NewProduction, or NewDevelopment
 	defer logger.Sync()
 
 	const url = "http://example.com"
@@ -55,9 +55,9 @@ func Example_presets() {
 	// structured logging.
 	logger.Info("Failed to fetch URL.",
 		// Structured context as strongly typed fields.
-		zap.String("url", url),
-		zap.Int("attempt", 3),
-		zap.Duration("backoff", time.Second),
+		lad.String("url", url),
+		lad.Int("attempt", 3),
+		lad.Duration("backoff", time.Second),
 	)
 	// Output:
 	// {"level":"info","msg":"Failed to fetch URL.","url":"http://example.com","attempt":3,"backoff":"1s"}
@@ -87,11 +87,11 @@ func Example_basicConfiguration() {
 	  }
 	}`)
 
-	var cfg zap.Config
+	var cfg lad.Config
 	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
 		panic(err)
 	}
-	logger := zap.Must(cfg.Build())
+	logger := lad.Must(cfg.Build())
 	defer logger.Sync()
 
 	logger.Info("logger construction succeeded")
@@ -110,10 +110,10 @@ func Example_advancedConfiguration() {
 	// high-priority logs.
 
 	// First, define our level-handling logic.
-	highPriority := zap.LevelEnablerFunc(func(lvl ladcore.Level) bool {
+	highPriority := lad.LevelEnablerFunc(func(lvl ladcore.Level) bool {
 		return lvl >= ladcore.ErrorLevel
 	})
-	lowPriority := zap.LevelEnablerFunc(func(lvl ladcore.Level) bool {
+	lowPriority := lad.LevelEnablerFunc(func(lvl ladcore.Level) bool {
 		return lvl < ladcore.ErrorLevel
 	})
 
@@ -132,8 +132,8 @@ func Example_advancedConfiguration() {
 
 	// Optimize the Kafka output for machine consumption and the console output
 	// for human operators.
-	kafkaEncoder := ladcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
-	consoleEncoder := ladcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+	kafkaEncoder := ladcore.NewJSONEncoder(lad.NewProductionEncoderConfig())
+	consoleEncoder := ladcore.NewConsoleEncoder(lad.NewDevelopmentEncoderConfig())
 
 	// Join the outputs, encoders, and level-handling functions into
 	// ladcore.Cores, then tee the four cores together.
@@ -145,18 +145,18 @@ func Example_advancedConfiguration() {
 	)
 
 	// From a ladcore.Core, it's easy to construct a Logger.
-	logger := zap.New(core)
+	logger := lad.New(core)
 	defer logger.Sync()
 	logger.Info("constructed a logger")
 }
 
 func ExampleNamespace() {
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
 	logger.With(
-		zap.Namespace("metrics"),
-		zap.Int("counter", 1),
+		lad.Namespace("metrics"),
+		lad.Int("counter", 1),
 	).Info("tracked some metrics")
 	// Output:
 	// {"level":"info","msg":"tracked some metrics","metrics":{"counter":1}}
@@ -181,12 +181,12 @@ func (a addr) MarshalLogObject(enc ladcore.ObjectEncoder) error {
 
 func (r *request) MarshalLogObject(enc ladcore.ObjectEncoder) error {
 	enc.AddString("url", r.URL)
-	zap.Inline(r.Listen).AddTo(enc)
+	lad.Inline(r.Listen).AddTo(enc)
 	return enc.AddObject("remote", r.Remote)
 }
 
 func ExampleObject() {
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
 	req := &request{
@@ -194,28 +194,28 @@ func ExampleObject() {
 		Listen: addr{"127.0.0.1", 8080},
 		Remote: addr{"127.0.0.1", 31200},
 	}
-	logger.Info("new request, in nested object", zap.Object("req", req))
-	logger.Info("new request, inline", zap.Inline(req))
+	logger.Info("new request, in nested object", lad.Object("req", req))
+	logger.Info("new request, inline", lad.Inline(req))
 	// Output:
 	// {"level":"info","msg":"new request, in nested object","req":{"url":"/test","ip":"127.0.0.1","port":8080,"remote":{"ip":"127.0.0.1","port":31200}}}
 	// {"level":"info","msg":"new request, inline","url":"/test","ip":"127.0.0.1","port":8080,"remote":{"ip":"127.0.0.1","port":31200}}
 }
 
 func ExampleNewStdLog() {
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
-	std := zap.NewStdLog(logger)
+	std := lad.NewStdLog(logger)
 	std.Print("standard logger wrapper")
 	// Output:
 	// {"level":"info","msg":"standard logger wrapper"}
 }
 
 func ExampleRedirectStdLog() {
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
-	undo := zap.RedirectStdLog(logger)
+	undo := lad.RedirectStdLog(logger)
 	defer undo()
 
 	log.Print("redirected standard library")
@@ -224,25 +224,25 @@ func ExampleRedirectStdLog() {
 }
 
 func ExampleReplaceGlobals() {
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
-	undo := zap.ReplaceGlobals(logger)
+	undo := lad.ReplaceGlobals(logger)
 	defer undo()
 
-	zap.L().Info("replaced zap's global loggers")
+	lad.L().Info("replaced lad's global loggers")
 	// Output:
-	// {"level":"info","msg":"replaced zap's global loggers"}
+	// {"level":"info","msg":"replaced lad's global loggers"}
 }
 
 func ExampleAtomicLevel() {
-	atom := zap.NewAtomicLevel()
+	atom := lad.NewAtomicLevel()
 
 	// To keep the example deterministic, disable timestamps in the output.
-	encoderCfg := zap.NewProductionEncoderConfig()
+	encoderCfg := lad.NewProductionEncoderConfig()
 	encoderCfg.TimeKey = ""
 
-	logger := zap.New(ladcore.NewCore(
+	logger := lad.New(ladcore.NewCore(
 		ladcore.NewJSONEncoder(encoderCfg),
 		ladcore.Lock(os.Stdout),
 		atom,
@@ -251,14 +251,14 @@ func ExampleAtomicLevel() {
 
 	logger.Info("info logging enabled")
 
-	atom.SetLevel(zap.ErrorLevel)
+	atom.SetLevel(lad.ErrorLevel)
 	logger.Info("info logging disabled")
 	// Output:
 	// {"level":"info","msg":"info logging enabled"}
 }
 
 func ExampleAtomicLevel_config() {
-	// The zap.Config struct includes an AtomicLevel. To use it, keep a
+	// The lad.Config struct includes an AtomicLevel. To use it, keep a
 	// reference to the Config.
 	rawJSON := []byte(`{
 		"level": "info",
@@ -271,32 +271,32 @@ func ExampleAtomicLevel_config() {
 			"levelEncoder": "lowercase"
 		}
 	}`)
-	var cfg zap.Config
+	var cfg lad.Config
 	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
 		panic(err)
 	}
-	logger := zap.Must(cfg.Build())
+	logger := lad.Must(cfg.Build())
 	defer logger.Sync()
 
 	logger.Info("info logging enabled")
 
-	cfg.Level.SetLevel(zap.ErrorLevel)
+	cfg.Level.SetLevel(lad.ErrorLevel)
 	logger.Info("info logging disabled")
 	// Output:
 	// {"level":"info","message":"info logging enabled"}
 }
 
 func ExampleLogger_Check() {
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
-	if ce := logger.Check(zap.DebugLevel, "debugging"); ce != nil {
-		// If debug-level log output isn't enabled or if zap's sampling would have
+	if ce := logger.Check(lad.DebugLevel, "debugging"); ce != nil {
+		// If debug-level log output isn't enabled or if lad's sampling would have
 		// dropped this log entry, we don't allocate the slice that holds these
 		// fields.
 		ce.Write(
-			zap.String("foo", "bar"),
-			zap.String("baz", "quux"),
+			lad.String("foo", "bar"),
+			lad.String("baz", "quux"),
 		)
 	}
 
@@ -305,7 +305,7 @@ func ExampleLogger_Check() {
 }
 
 func ExampleLogger_Named() {
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
 	// By default, Loggers are unnamed.
@@ -326,11 +326,11 @@ func ExampleLogger_Named() {
 func ExampleWrapCore_replace() {
 	// Replacing a Logger's core can alter fundamental behaviors.
 	// For example, it can convert a Logger to a no-op.
-	nop := zap.WrapCore(func(ladcore.Core) ladcore.Core {
+	nop := lad.WrapCore(func(ladcore.Core) ladcore.Core {
 		return ladcore.NewNopCore()
 	})
 
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
 	logger.Info("working")
@@ -344,11 +344,11 @@ func ExampleWrapCore_replace() {
 func ExampleWrapCore_wrap() {
 	// Wrapping a Logger's core can extend its functionality. As a trivial
 	// example, it can double-write all logs.
-	doubled := zap.WrapCore(func(c ladcore.Core) ladcore.Core {
+	doubled := lad.WrapCore(func(c ladcore.Core) ladcore.Core {
 		return ladcore.NewTee(c, c)
 	})
 
-	logger := zap.NewExample()
+	logger := lad.NewExample()
 	defer logger.Sync()
 
 	logger.Info("single")
@@ -357,4 +357,57 @@ func ExampleWrapCore_wrap() {
 	// {"level":"info","msg":"single"}
 	// {"level":"info","msg":"doubled"}
 	// {"level":"info","msg":"doubled"}
+}
+
+func ExampleDict() {
+	logger := lad.NewExample()
+	defer logger.Sync()
+
+	logger.Info("login event",
+		lad.Dict("event",
+			lad.Int("id", 123),
+			lad.String("name", "jane"),
+			lad.String("status", "pending")))
+	// Output:
+	// {"level":"info","msg":"login event","event":{"id":123,"name":"jane","status":"pending"}}
+}
+
+func ExampleObjects() {
+	logger := lad.NewExample()
+	defer logger.Sync()
+
+	// Use the Objects field constructor when you have a list of objects,
+	// all of which implement ladcore.ObjectMarshaler.
+	logger.Debug("opening connections",
+		lad.Objects("addrs", []addr{
+			{IP: "123.45.67.89", Port: 4040},
+			{IP: "127.0.0.1", Port: 4041},
+			{IP: "192.168.0.1", Port: 4042},
+		}))
+	// Output:
+	// {"level":"debug","msg":"opening connections","addrs":[{"ip":"123.45.67.89","port":4040},{"ip":"127.0.0.1","port":4041},{"ip":"192.168.0.1","port":4042}]}
+}
+
+func ExampleObjectValues() {
+	logger := lad.NewExample()
+	defer logger.Sync()
+
+	// Use the ObjectValues field constructor when you have a list of
+	// objects that do not implement ladcore.ObjectMarshaler directly,
+	// but on their pointer receivers.
+	logger.Debug("starting tunnels",
+		lad.ObjectValues("addrs", []request{
+			{
+				URL:    "/foo",
+				Listen: addr{"127.0.0.1", 8080},
+				Remote: addr{"123.45.67.89", 4040},
+			},
+			{
+				URL:    "/bar",
+				Listen: addr{"127.0.0.1", 8080},
+				Remote: addr{"127.0.0.1", 31200},
+			},
+		}))
+	// Output:
+	// {"level":"debug","msg":"starting tunnels","addrs":[{"url":"/foo","ip":"127.0.0.1","port":8080,"remote":{"ip":"123.45.67.89","port":4040}},{"url":"/bar","ip":"127.0.0.1","port":8080,"remote":{"ip":"127.0.0.1","port":31200}}]}
 }

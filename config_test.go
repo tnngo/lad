@@ -23,12 +23,12 @@ package lad
 import (
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tnngo/lad/ladcore"
-	"go.uber.org/atomic"
 )
 
 func TestConfig(t *testing.T) {
@@ -52,7 +52,7 @@ func TestConfig(t *testing.T) {
 			expectRe: "DEBUG\t[a-z0-9_-]+/config_test.go:" + `\d+` + "\tdebug\t" + `{"k": "v", "z": "zz"}` + "\n" +
 				"INFO\t[a-z0-9_-]+/config_test.go:" + `\d+` + "\tinfo\t" + `{"k": "v", "z": "zz"}` + "\n" +
 				"WARN\t[a-z0-9_-]+/config_test.go:" + `\d+` + "\twarn\t" + `{"k": "v", "z": "zz"}` + "\n" +
-				`go.uber.org/zap.TestConfig.\w+`,
+				`github.com/tnngo/lad.TestConfig.\w+`,
 		},
 	}
 
@@ -144,14 +144,15 @@ func TestConfigWithMissingAttributes(t *testing.T) {
 }
 
 func makeSamplerCountingHook() (h func(ladcore.Entry, ladcore.SamplingDecision),
-	dropped, sampled *atomic.Int64) {
+	dropped, sampled *atomic.Int64,
+) {
 	dropped = new(atomic.Int64)
 	sampled = new(atomic.Int64)
 	h = func(_ ladcore.Entry, dec ladcore.SamplingDecision) {
 		if dec&ladcore.LogDropped > 0 {
-			dropped.Inc()
+			dropped.Add(1)
 		} else if dec&ladcore.LogSampled > 0 {
-			sampled.Inc()
+			sampled.Add(1)
 		}
 	}
 	return h, dropped, sampled

@@ -23,7 +23,7 @@ package ladtest
 import (
 	"bytes"
 
-	zap "github.com/tnngo/lad"
+	"github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
 )
 
@@ -34,7 +34,7 @@ type LoggerOption interface {
 
 type loggerOptions struct {
 	Level      ladcore.LevelEnabler
-	zapOptions []zap.Option
+	ladOptions []lad.Option
 }
 
 type loggerOptionFunc func(*loggerOptions)
@@ -51,10 +51,10 @@ func Level(enab ladcore.LevelEnabler) LoggerOption {
 	})
 }
 
-// WrapOptions adds zap.Option's to a test Logger built by NewLogger.
-func WrapOptions(zapOpts ...zap.Option) LoggerOption {
+// WrapOptions adds lad.Option's to a test Logger built by NewLogger.
+func WrapOptions(ladOpts ...lad.Option) LoggerOption {
 	return loggerOptionFunc(func(opts *loggerOptions) {
-		opts.zapOptions = zapOpts
+		opts.ladOptions = ladOpts
 	})
 }
 
@@ -69,12 +69,12 @@ func WrapOptions(zapOpts ...zap.Option) LoggerOption {
 // The returned logger defaults to logging debug level messages and above.
 // This may be changed by passing a ladtest.Level during construction.
 //
-//	logger := ladtest.NewLogger(t, ladtest.Level(zap.WarnLevel))
+//	logger := ladtest.NewLogger(t, ladtest.Level(lad.WarnLevel))
 //
-// You may also pass zap.Option's to customize test logger.
+// You may also pass lad.Option's to customize test logger.
 //
-//	logger := ladtest.NewLogger(t, ladtest.WrapOptions(zap.AddCaller()))
-func NewLogger(t TestingT, opts ...LoggerOption) *zap.Logger {
+//	logger := ladtest.NewLogger(t, ladtest.WrapOptions(lad.AddCaller()))
+func NewLogger(t TestingT, opts ...LoggerOption) *lad.Logger {
 	cfg := loggerOptions{
 		Level: ladcore.DebugLevel,
 	}
@@ -83,20 +83,20 @@ func NewLogger(t TestingT, opts ...LoggerOption) *zap.Logger {
 	}
 
 	writer := newTestingWriter(t)
-	zapOptions := []zap.Option{
-		// Send zap errors to the same writer and mark the test as failed if
+	ladOptions := []lad.Option{
+		// Send lad errors to the same writer and mark the test as failed if
 		// that happens.
-		zap.ErrorOutput(writer.WithMarkFailed(true)),
+		lad.ErrorOutput(writer.WithMarkFailed(true)),
 	}
-	zapOptions = append(zapOptions, cfg.zapOptions...)
+	ladOptions = append(ladOptions, cfg.ladOptions...)
 
-	return zap.New(
+	return lad.New(
 		ladcore.NewCore(
-			ladcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
+			ladcore.NewConsoleEncoder(lad.NewDevelopmentEncoderConfig()),
 			writer,
 			cfg.Level,
 		),
-		zapOptions...,
+		ladOptions...,
 	)
 }
 

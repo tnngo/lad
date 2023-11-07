@@ -34,7 +34,7 @@ import (
 
 func TestLoggerV2(t *testing.T) {
 	core, observedLogs := observer.New(ladcore.InfoLevel)
-	zlog := zap.New(core)
+	zlog := lad.New(core)
 
 	grpclog.SetLoggerV2(ladgrpc.NewLogger(zlog))
 

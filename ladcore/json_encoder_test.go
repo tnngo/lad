@@ -27,14 +27,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	zap "github.com/tnngo/lad"
+	"github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
 )
 
 // TestJSONEncodeEntry is an more "integrated" test that makes it easier to get
 // coverage on the json encoder (e.g. putJSONEncoder, let alone EncodeEntry
 // itself) than the tests in json_encoder_impl_test.go; it needs to be in the
-// ladcore_test package, so that it can import the toplevel zap package for
+// ladcore_test package, so that it can import the toplevel lad package for
 // field constructor convenience.
 func TestJSONEncodeEntry(t *testing.T) {
 	type bar struct {
@@ -86,19 +86,19 @@ func TestJSONEncodeEntry(t *testing.T) {
 				Message:    "lob law",
 			},
 			fields: []ladcore.Field{
-				zap.String("so", "passes"),
-				zap.Int("answer", 42),
-				zap.Float64("common_pie", 3.14),
-				zap.Float32("a_float32", 2.71),
-				zap.Complex128("complex_value", 3.14-2.71i),
+				lad.String("so", "passes"),
+				lad.Int("answer", 42),
+				lad.Float64("common_pie", 3.14),
+				lad.Float32("a_float32", 2.71),
+				lad.Complex128("complex_value", 3.14-2.71i),
 				// Cover special-cased handling of nil in AddReflect() and
 				// AppendReflect(). Note that for the latter, we explicitly test
 				// correct results for both the nil static interface{} value
 				// (`nil`), as well as the non-nil interface value with a
 				// dynamic type and nil value (`(*struct{})(nil)`).
-				zap.Reflect("null_value", nil),
-				zap.Reflect("array_with_null_elements", []interface{}{&struct{}{}, nil, (*struct{})(nil), 2}),
-				zap.Reflect("such", foo{
+				lad.Reflect("null_value", nil),
+				lad.Reflect("array_with_null_elements", []interface{}{&struct{}{}, nil, (*struct{})(nil), 2}),
+				lad.Reflect("such", foo{
 					A: "lol",
 					B: 123,
 					C: 0.9999,
@@ -107,6 +107,20 @@ func TestJSONEncodeEntry(t *testing.T) {
 						{"tau", 6.283185307179586},
 					},
 				}),
+			},
+		},
+		{
+			desc: "zero_time_omitted",
+			expected: `{
+				"L": "info",
+				"N": "name",
+				"M": "message"
+			}`,
+			ent: ladcore.Entry{
+				Level:      ladcore.InfoLevel,
+				Time:       time.Time{},
+				LoggerName: "name",
+				Message:    "message",
 			},
 		},
 	}
@@ -158,7 +172,7 @@ func TestNoEncodeLevelSupplied(t *testing.T) {
 	}
 
 	fields := []ladcore.Field{
-		zap.Int("answer", 42),
+		lad.Int("answer", 42),
 	}
 
 	_, err := enc.EncodeEntry(ent, fields)
@@ -173,12 +187,12 @@ func TestJSONEmptyConfig(t *testing.T) {
 	}{
 		{
 			name:     "time",
-			field:    zap.Time("foo", time.Unix(1591287718, 0)), // 2020-06-04 09:21:58 -0700 PDT
+			field:    lad.Time("foo", time.Unix(1591287718, 0)), // 2020-06-04 09:21:58 -0700 PDT
 			expected: `{"foo": 1591287718000000000}`,
 		},
 		{
 			name:     "duration",
-			field:    zap.Duration("bar", time.Microsecond),
+			field:    lad.Duration("bar", time.Microsecond),
 			expected: `{"bar": 1000}`,
 		},
 	}

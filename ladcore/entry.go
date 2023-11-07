@@ -24,26 +24,24 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/tnngo/lad/internal/bufferpool"
 	"github.com/tnngo/lad/internal/exit"
 
+	"github.com/tnngo/lad/internal/pool"
 	"go.uber.org/multierr"
 )
 
-var (
-	_cePool = sync.Pool{New: func() interface{} {
-		// Pre-allocate some space for cores.
-		return &CheckedEntry{
-			cores: make([]Core, 4),
-		}
-	}}
-)
+var _cePool = pool.New(func() *CheckedEntry {
+	// Pre-allocate some space for cores.
+	return &CheckedEntry{
+		cores: make([]Core, 4),
+	}
+})
 
 func getCheckedEntry() *CheckedEntry {
-	ce := _cePool.Get().(*CheckedEntry)
+	ce := _cePool.Get()
 	ce.reset()
 	return ce
 }
@@ -245,7 +243,7 @@ func (ce *CheckedEntry) Write(fields ...Field) {
 			// CheckedEntry is being used after it was returned to the pool,
 			// the message may be an amalgamation from multiple call sites.
 			fmt.Fprintf(ce.ErrorOutput, "%v Unsafe CheckedEntry re-use near Entry %+v.\n", ce.Time, ce.Entry)
-			ce.ErrorOutput.Sync()
+			_ = ce.ErrorOutput.Sync() // ignore error
 		}
 		return
 	}
@@ -257,7 +255,7 @@ func (ce *CheckedEntry) Write(fields ...Field) {
 	}
 	if err != nil && ce.ErrorOutput != nil {
 		fmt.Fprintf(ce.ErrorOutput, "%v write error: %v\n", ce.Time, err)
-		ce.ErrorOutput.Sync()
+		_ = ce.ErrorOutput.Sync() // ignore error
 	}
 
 	hook := ce.after
