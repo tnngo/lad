@@ -44,6 +44,7 @@ type Logger struct {
 
 	development bool
 	addCaller   bool
+	onPanic     ladcore.CheckWriteHook // default is WriteThenPanic
 	onFatal     ladcore.CheckWriteHook // default is WriteThenFatal
 
 	name        string
@@ -348,27 +349,12 @@ func (log *Logger) check(lvl ladcore.Level, msg string) *ladcore.CheckedEntry {
 	// Set up any required terminal behavior.
 	switch ent.Level {
 	case ladcore.PanicLevel:
-		ce = ce.After(ent, ladcore.WriteThenPanic)
+		ce = ce.After(ent, terminalHookOverride(ladcore.WriteThenPanic, log.onPanic))
 	case ladcore.FatalLevel:
-		onFatal := log.onFatal
-		// nil or WriteThenNoop will lead to continued execution after
-		// a Fatal log entry, which is unexpected. For example,
-		//
-		//   f, err := os.Open(..)
-		//   if err != nil {
-		//     log.Fatal("cannot open", zap.Error(err))
-		//   }
-		//   fmt.Println(f.Name())
-		//
-		// The f.Name() will panic if we continue execution after the
-		// log.Fatal.
-		if onFatal == nil || onFatal == ladcore.WriteThenNoop {
-			onFatal = ladcore.WriteThenFatal
-		}
-		ce = ce.After(ent, onFatal)
+		ce = ce.After(ent, terminalHookOverride(ladcore.WriteThenFatal, log.onFatal))
 	case ladcore.DPanicLevel:
 		if log.development {
-			ce = ce.After(ent, ladcore.WriteThenPanic)
+			ce = ce.After(ent, terminalHookOverride(ladcore.WriteThenPanic, log.onPanic))
 		}
 	}
 
@@ -443,4 +429,20 @@ func (log *Logger) WithContext(ctx context.Context) *Logger {
 	} else {
 		return log
 	}
+}
+func terminalHookOverride(defaultHook, override ladcore.CheckWriteHook) ladcore.CheckWriteHook {
+	// A nil or WriteThenNoop hook will lead to continued execution after
+	// a Panic or Fatal log entry, which is unexpected. For example,
+	//
+	//   f, err := os.Open(..)
+	//   if err != nil {
+	//     log.Fatal("cannot open", zap.Error(err))
+	//   }
+	//   fmt.Println(f.Name())
+	//
+	// The f.Name() will panic if we continue execution after the log.Fatal.
+	if override == nil || override == ladcore.WriteThenNoop {
+		return defaultHook
+	}
+	return override
 }

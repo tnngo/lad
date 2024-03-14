@@ -25,6 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	. "github.com/tnngo/lad/ladcore"
+	//revive:disable:dot-imports
 )
 
 var testEntry = Entry{

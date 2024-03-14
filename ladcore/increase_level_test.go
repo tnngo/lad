@@ -29,6 +29,7 @@ import (
 	zap "github.com/tnngo/lad"
 	. "github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/ladtest/observer"
+	//revive:disable:dot-imports
 )
 
 func TestIncreaseLevel(t *testing.T) {

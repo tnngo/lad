@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tnngo/lad/internal/ztest"
 	. "github.com/tnngo/lad/ladcore"
+	//revive:disable:dot-imports
 )
 
 var counterTestCases = [][]string{

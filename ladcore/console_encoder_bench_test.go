@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	. "github.com/tnngo/lad/ladcore"
+	//revive:disable:dot-imports
 )
 
 func BenchmarkZapConsole(b *testing.B) {

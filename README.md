@@ -1,6 +1,19 @@
+<<<<<<< HEAD
 # Lad
+=======
+# :zap: zap
+
+
+<div align="center">
+>>>>>>> b39f8b6b6a44d8371a87610be50cce58eeeaabcb
 
 Add context logger for zap.
+
+![Zap logo](assets/logo.png)
+
+[![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov]
+
+</div>
 
 ## Installation
 
@@ -150,7 +163,7 @@ standard.
 
 <hr>
 
-Released under the [MIT License](LICENSE.txt).
+Released under the [MIT License](LICENSE).
 
 <sup id="footnote-versions">1</sup> In particular, keep in mind that we may be
 benchmarking against slightly older versions of other packages. Versions are

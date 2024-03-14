@@ -116,11 +116,32 @@ func (s *SugaredLogger) With(args ...interface{}) *SugaredLogger {
 	return &SugaredLogger{base: s.base.With(s.sweetenFields(args)...)}
 }
 
+// WithLazy adds a variadic number of fields to the logging context lazily.
+// The fields are evaluated only if the logger is further chained with [With]
+// or is written to with any of the log level methods.
+// Until that occurs, the logger may retain references to objects inside the fields,
+// and logging will reflect the state of an object at the time of logging,
+// not the time of WithLazy().
+//
+// Similar to [With], fields added to the child don't affect the parent,
+// and vice versa. Also, the keys in key-value pairs should be strings. In development,
+// passing a non-string key panics, while in production it logs an error and skips the pair.
+// Passing an orphaned key has the same behavior.
+func (s *SugaredLogger) WithLazy(args ...interface{}) *SugaredLogger {
+	return &SugaredLogger{base: s.base.WithLazy(s.sweetenFields(args)...)}
+}
+
 // Level reports the minimum enabled level for this logger.
 //
 // For NopLoggers, this is [ladcore.InvalidLevel].
 func (s *SugaredLogger) Level() ladcore.Level {
 	return ladcore.LevelOf(s.base.core)
+}
+
+// Log logs the provided arguments at provided level.
+// Spaces are added between arguments when neither is a string.
+func (s *SugaredLogger) Log(lvl ladcore.Level, args ...interface{}) {
+	s.log(lvl, "", args, nil)
 }
 
 // Debug logs the provided arguments at [DebugLevel].
@@ -166,6 +187,12 @@ func (s *SugaredLogger) Fatal(args ...interface{}) {
 	s.log(FatalLevel, "", args, nil)
 }
 
+// Logf formats the message according to the format specifier
+// and logs it at provided level.
+func (s *SugaredLogger) Logf(lvl ladcore.Level, template string, args ...interface{}) {
+	s.log(lvl, template, args, nil)
+}
+
 // Debugf formats the message according to the format specifier
 // and logs it at [DebugLevel].
 func (s *SugaredLogger) Debugf(template string, args ...interface{}) {
@@ -207,6 +234,12 @@ func (s *SugaredLogger) Panicf(template string, args ...interface{}) {
 // and calls os.Exit.
 func (s *SugaredLogger) Fatalf(template string, args ...interface{}) {
 	s.log(FatalLevel, template, args, nil)
+}
+
+// Logw logs a message with some additional context. The variadic key-value
+// pairs are treated as they are in With.
+func (s *SugaredLogger) Logw(lvl ladcore.Level, msg string, keysAndValues ...interface{}) {
+	s.log(lvl, msg, nil, keysAndValues)
 }
 
 // Debugw logs a message with some additional context. The variadic key-value
@@ -254,6 +287,12 @@ func (s *SugaredLogger) Panicw(msg string, keysAndValues ...interface{}) {
 // variadic key-value pairs are treated as they are in With.
 func (s *SugaredLogger) Fatalw(msg string, keysAndValues ...interface{}) {
 	s.log(FatalLevel, msg, nil, keysAndValues)
+}
+
+// Logln logs a message at provided level.
+// Spaces are always added between arguments.
+func (s *SugaredLogger) Logln(lvl ladcore.Level, args ...interface{}) {
+	s.logln(lvl, args, nil)
 }
 
 // Debugln logs a message at [DebugLevel].

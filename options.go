@@ -133,6 +133,21 @@ func IncreaseLevel(lvl ladcore.LevelEnabler) Option {
 	})
 }
 
+// WithPanicHook sets a CheckWriteHook to run on Panic/DPanic logs.
+// Zap will call this hook after writing a log statement with a Panic/DPanic level.
+//
+// For example, the following builds a logger that will exit the current
+// goroutine after writing a Panic/DPanic log message, but it will not start a panic.
+//
+//	zap.New(core, zap.WithPanicHook(ladcore.WriteThenGoexit))
+//
+// This is useful for testing Panic/DPanic log output.
+func WithPanicHook(hook ladcore.CheckWriteHook) Option {
+	return optionFunc(func(log *Logger) {
+		log.onPanic = hook
+	})
+}
+
 // OnFatal sets the action to take on fatal logs.
 //
 // Deprecated: Use [WithFatalHook] instead.

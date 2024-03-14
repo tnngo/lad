@@ -32,6 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 	zap "github.com/tnngo/lad"
 	. "github.com/tnngo/lad/ladcore"
+	//revive:disable:dot-imports
 )
 
 type users int
@@ -88,9 +89,8 @@ type errObj struct {
 func (eobj *errObj) Error() string {
 	if eobj.kind == 1 {
 		panic("panic in Error() method")
-	} else {
-		return eobj.errMsg
 	}
+	return eobj.errMsg
 }
 
 func TestUnknownFieldType(t *testing.T) {
