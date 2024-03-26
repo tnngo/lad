@@ -20,8 +20,6 @@ Note that zap only supports the two most recent minor versions of Go.
 
 Support for logging contextual metadata, 
 
-### Context
-
 ```go
 defineContext := Context(func(ctx context.Context) []Field {
   var fields []Field
