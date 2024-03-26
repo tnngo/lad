@@ -14,8 +14,6 @@ Add context logger for zap.
 
 `go get -u github.com/tnngo/lad`
 
-Note that zap only supports the two most recent minor versions of Go.
-
 ## Change
 
 Support for logging contextual metadata, 
