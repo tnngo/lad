@@ -1,11 +1,7 @@
-<<<<<<< HEAD
 # Lad
-=======
-# :zap: zap
 
 
 <div align="center">
->>>>>>> b39f8b6b6a44d8371a87610be50cce58eeeaabcb
 
 Add context logger for zap.
 
