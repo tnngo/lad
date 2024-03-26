@@ -7,7 +7,6 @@ Add context logger for zap.
 
 ![Zap logo](assets/logo.png)
 
-[![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov]
 
 </div>
 
