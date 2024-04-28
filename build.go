@@ -14,18 +14,14 @@ type LadOption struct {
 	Filename string
 }
 
-func Build() {
-	build(nil)
-}
-
-func BuildOption(opt *LadOption) {
-	build(opt)
-}
-func build(opt *LadOption) {
-	if opt == nil {
+func Build(opts ...*LadOption) {
+	var opt *LadOption
+	if len(opts) == 0 {
 		opt = &LadOption{
 			Level: DebugLevel,
 		}
+	} else {
+		opt = opts[0]
 	}
 
 	var cores []ladcore.Core
