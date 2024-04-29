@@ -14,7 +14,8 @@ type LadOption struct {
 	Filename string
 }
 
-func Build(opts ...*LadOption) {
+// 初始化
+func Init(opts ...*LadOption) {
 	var opt *LadOption
 	if len(opts) == 0 {
 		opt = &LadOption{
