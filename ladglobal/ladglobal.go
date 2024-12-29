@@ -106,6 +106,36 @@ func DefaultFile() {
 	}
 
 	var cores []ladcore.Core
+
+	f := &File{
+		Filename:   filename,
+		LadLevel:   lad.DebugLevel,
+		MaxSize:    64,
+		MaxBackups: 10,
+		MaxAge:     30,
+		Compress:   true,
+	}
+
+	cores = append(cores, f.mode())
+	core := ladcore.NewTee(cores...)
+
+	lad.ReplaceGlobals(lad.New(core, lad.AddCaller()))
+}
+
+func Default() {
+	var filename string
+
+	// 获取可执行文件的完整路径
+	execPath, err := os.Executable()
+	if err != nil {
+		fmt.Println("获取可执行文件路径失败:", err)
+		filename = "lad.log"
+	} else {
+		// 提取文件名
+		filename = filepath.Base(execPath)
+	}
+
+	var cores []ladcore.Core
 	cores = append(cores, (&Console{
 		Level: lad.DebugLevel,
 	}).mode())
