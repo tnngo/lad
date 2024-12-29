@@ -1,8 +1,10 @@
 package ladglobal
 
 import (
+	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/tnngo/lad"
@@ -91,18 +93,32 @@ func (f *File) mode() ladcore.Core {
 }
 
 func DefaultFile() {
+	var filename string
+
+	// 获取可执行文件的完整路径
+	execPath, err := os.Executable()
+	if err != nil {
+		fmt.Println("获取可执行文件路径失败:", err)
+		filename = "lad.log"
+	} else {
+		// 提取文件名
+		filename = filepath.Base(execPath)
+	}
+
 	var cores []ladcore.Core
 	cores = append(cores, (&Console{
 		Level: lad.DebugLevel,
 	}).mode())
 
 	f := &File{
+		Filename:   filename,
 		LadLevel:   lad.DebugLevel,
 		MaxSize:    64,
 		MaxBackups: 10,
 		MaxAge:     30,
 		Compress:   true,
 	}
+
 	cores = append(cores, f.mode())
 	core := ladcore.NewTee(cores...)
 
