@@ -41,7 +41,7 @@ func (c *Console) mode() ladcore.Core {
 	)
 }
 
-func BuildDefaultConsole() {
+func DefaultConsole() {
 	c := &Console{
 		Level: lad.DebugLevel,
 	}
@@ -90,7 +90,7 @@ func (f *File) mode() ladcore.Core {
 	)
 }
 
-func BuildDefaultFile() {
+func DefaultFile() {
 	var cores []ladcore.Core
 	cores = append(cores, (&Console{
 		Level: lad.DebugLevel,

@@ -6,7 +6,7 @@ import (
 	"github.com/tnngo/lad"
 )
 
-func TestBuildDefaultFile(t *testing.T) {
+func TestDefaultFile(t *testing.T) {
 	tests := []struct {
 		name string
 	}{
@@ -17,7 +17,7 @@ func TestBuildDefaultFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			BuildDefaultFile()
+			DefaultFile()
 			lad.L().Debug("test")
 		})
 	}
