@@ -102,7 +102,7 @@ func DefaultFile() {
 		filename = "lad.log"
 	} else {
 		// 提取文件名
-		filename = filepath.Base(execPath)
+		filename = filepath.Base(execPath) + ".log"
 	}
 
 	var cores []ladcore.Core
