@@ -99,20 +99,20 @@ if err != nil {
 
 ## Installation
 
-### What does the error `expects import "go.uber.org/zap"` mean?
+### What does the error `expects import "github.com/tnngo/lad"` mean?
 
 Either zap was installed incorrectly or you're referencing the wrong package
 name in your code.
 
 Zap's source code happens to be hosted on GitHub, but the [import
-path][import-path] is `go.uber.org/zap`. This gives us, the project
+path][import-path] is `github.com/tnngo/lad`. This gives us, the project
 maintainers, the freedom to move the source code if necessary. However, it
 means that you need to take a little care when installing and using the
 package.
 
 If you follow two simple rules, everything should work: install zap with `go
-get -u go.uber.org/zap`, and always import it in your code with `import
-"go.uber.org/zap"`. Your code shouldn't contain *any* references to
+get -u github.com/tnngo/lad`, and always import it in your code with `import
+"github.com/tnngo/lad"`. Your code shouldn't contain *any* references to
 `github.com/uber-go/zap`.
 
 ## Usage
@@ -123,23 +123,23 @@ Zap doesn't natively support rotating log files, since we prefer to leave this
 to an external program like `logrotate`.
 
 However, it's easy to integrate a log rotation package like
-[`gopkg.in/natefinch/lumberjack.v2`][lumberjack] as a `zapcore.WriteSyncer`.
+[`gopkg.in/natefinch/lumberjack.v2`][lumberjack] as a `ladcore.WriteSyncer`.
 
 ```go
 // lumberjack.Logger is already safe for concurrent use, so we don't need to
 // lock it.
-w := zapcore.AddSync(&lumberjack.Logger{
+w := ladcore.AddSync(&lumberjack.Logger{
   Filename:   "/var/log/myapp/foo.log",
   MaxSize:    500, // megabytes
   MaxBackups: 3,
   MaxAge:     28, // days
 })
-core := zapcore.NewCore(
-  zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+core := ladcore.NewCore(
+  ladcore.NewJSONEncoder(lad.NewProductionEncoderConfig()),
   w,
-  zap.InfoLevel,
+  lad.InfoLevel,
 )
-logger := zap.New(core)
+logger := lad.New(core)
 ```
 
 ## Extensions
@@ -154,7 +154,7 @@ We're aware of the following extensions, but haven't used them ourselves:
 | Package | Integration |
 | --- | --- |
 | `github.com/tchap/zapext` | Sentry, syslog |
-| `github.com/fgrosse/zaptest` | Ginkgo |
+| `github.com/fgrosse/ladtest` | Ginkgo |
 | `github.com/blendle/zapdriver` | Stackdriver |
 | `github.com/moul/zapgorm` | Gorm |
 | `github.com/moul/zapfilter` | Advanced filtering rules |

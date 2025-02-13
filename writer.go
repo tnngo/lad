@@ -18,14 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zap
+package lad
 
 import (
 	"fmt"
 	"io"
 
-	"go.uber.org/zap/zapcore"
-
+	"github.com/tnngo/lad/ladcore"
 	"go.uber.org/multierr"
 )
 
@@ -47,7 +46,7 @@ import (
 // a scheme, the special paths "stdout" and "stderr" are interpreted as
 // os.Stdout and os.Stderr. When specified without a scheme, relative file
 // paths also work.
-func Open(paths ...string) (zapcore.WriteSyncer, func(), error) {
+func Open(paths ...string) (ladcore.WriteSyncer, func(), error) {
 	writers, closeAll, err := open(paths)
 	if err != nil {
 		return nil, nil, err
@@ -57,8 +56,8 @@ func Open(paths ...string) (zapcore.WriteSyncer, func(), error) {
 	return writer, closeAll, nil
 }
 
-func open(paths []string) ([]zapcore.WriteSyncer, func(), error) {
-	writers := make([]zapcore.WriteSyncer, 0, len(paths))
+func open(paths []string) ([]ladcore.WriteSyncer, func(), error) {
+	writers := make([]ladcore.WriteSyncer, 0, len(paths))
 	closers := make([]io.Closer, 0, len(paths))
 	closeAll := func() {
 		for _, c := range closers {
@@ -89,10 +88,10 @@ func open(paths []string) ([]zapcore.WriteSyncer, func(), error) {
 // WriteSyncer.
 //
 // It's provided purely as a convenience; the result is no different from
-// using zapcore.NewMultiWriteSyncer and zapcore.Lock individually.
-func CombineWriteSyncers(writers ...zapcore.WriteSyncer) zapcore.WriteSyncer {
+// using ladcore.NewMultiWriteSyncer and ladcore.Lock individually.
+func CombineWriteSyncers(writers ...ladcore.WriteSyncer) ladcore.WriteSyncer {
 	if len(writers) == 0 {
-		return zapcore.AddSync(io.Discard)
+		return ladcore.AddSync(io.Discard)
 	}
-	return zapcore.Lock(zapcore.NewMultiWriteSyncer(writers...))
+	return ladcore.Lock(ladcore.NewMultiWriteSyncer(writers...))
 }

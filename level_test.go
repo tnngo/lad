@@ -18,22 +18,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zap
+package lad
 
 import (
 	"sync"
 	"testing"
 
-	"go.uber.org/zap/zapcore"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/tnngo/lad/ladcore"
 )
 
 func TestLevelEnablerFunc(t *testing.T) {
-	enab := LevelEnablerFunc(func(l zapcore.Level) bool { return l == zapcore.InfoLevel })
+	enab := LevelEnablerFunc(func(l ladcore.Level) bool { return l == ladcore.InfoLevel })
 	tests := []struct {
-		level   zapcore.Level
+		level   ladcore.Level
 		enabled bool
 	}{
 		{DebugLevel, false},
@@ -101,7 +100,7 @@ func TestAtomicLevelMutation(t *testing.T) {
 func TestAtomicLevelText(t *testing.T) {
 	tests := []struct {
 		text   string
-		expect zapcore.Level
+		expect ladcore.Level
 		err    bool
 	}{
 		{"debug", DebugLevel, false},

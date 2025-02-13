@@ -6,16 +6,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## 0.3.0 - 22 Oct 2024
 
 Breaking changes:
-* [#1339][]: zapslog: Drop `HandlerOptions` in favor of `HandlerOption`,
+* [#1339][]: ladslog: Drop `HandlerOptions` in favor of `HandlerOption`,
   which uses the functional options pattern.
-* [#1339][]: zapslog: Rename `AddSource` option to `WithCaller`.
+* [#1339][]: ladslog: Rename `AddSource` option to `WithCaller`.
 
 Enhancements:
-* [#1339][]: zapslog: Record stack traces for error logs or higher.
+* [#1339][]: ladslog: Record stack traces for error logs or higher.
   The new `AddStackAt` option changes this level.
 
 Bug fixes:
-* [#1344][], [#1408][]: zapslog: Comply fully with `slog.Handler` contract.
+* [#1344][], [#1408][]: ladslog: Comply fully with `slog.Handler` contract.
   This includes ignoring empty `Attr`s, inlining `Group`s with empty names,
   and omitting groups with no attributes.
 
@@ -28,8 +28,8 @@ Thanks to @zekth and @arukiidou for their contributions to this release.
 ## 0.2.0 - 9 Sep 2023
 
 Breaking changes:
-* [#1315][]: zapslog: Drop HandlerOptions.New in favor of just the NewHandler constructor.
-* [#1320][], [#1338][]: zapslog: Drop support for golang.org/x/exp/slog in favor of log/slog released in Go 1.21.
+* [#1315][]: ladslog: Drop HandlerOptions.New in favor of just the NewHandler constructor.
+* [#1320][], [#1338][]: ladslog: Drop support for golang.org/x/exp/slog in favor of log/slog released in Go 1.21.
 
 [#1315]: https://github.com/uber-go/zap/pull/1315
 [#1320]: https://github.com/uber-go/zap/pull/1320
@@ -37,7 +37,7 @@ Breaking changes:
 
 ## 0.1.0 - 1 Aug 2023
 
-Initial release of go.uber.org/zap/exp.
-This submodule contains experimental features for Zap.
+Initial release of github.com/tnngo/lad/exp.
+This submodule contains experimental features for lad.
 Features incubated here may be promoted to the root Zap module,
 but it's not guaranteed.
