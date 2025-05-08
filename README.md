@@ -1,5 +1,6 @@
 # :zap: zap
 
+Move to https://github.com/auwixcom/lad
 
 <div align="center">
 
