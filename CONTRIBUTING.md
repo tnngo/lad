@@ -19,9 +19,9 @@ you to accept the CLA when you open your pull request.
 ```bash
 mkdir -p $GOPATH/src/go.uber.org
 cd $GOPATH/src/go.uber.org
-git clone git@github.com:your_github_username/zap.git
+git clone git@github.com:your_github_username/lad.git
 cd zap
-git remote add upstream https://github.com/uber-go/zap.git
+git remote add upstream https://github.com/uber-go/lad.git
 git fetch upstream
 ```
 
@@ -37,7 +37,7 @@ make lint
 Start by creating a new branch for your changes:
 
 ```bash
-cd $GOPATH/src/go.uber.org/zap
+cd $GOPATH/src/github.com/tnngo/lad
 git checkout master
 git fetch upstream
 git rebase upstream/master

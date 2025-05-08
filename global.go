@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zap
+package lad
 
 import (
 	"bytes"
@@ -27,7 +27,7 @@ import (
 	"os"
 	"sync"
 
-	"go.uber.org/zap/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 const (
@@ -83,7 +83,7 @@ func NewStdLog(l *Logger) *log.Logger {
 
 // NewStdLogAt returns *log.Logger which writes to supplied zap logger at
 // required level.
-func NewStdLogAt(l *Logger, level zapcore.Level) (*log.Logger, error) {
+func NewStdLogAt(l *Logger, level ladcore.Level) (*log.Logger, error) {
 	logger := l.WithOptions(AddCallerSkip(_stdLogDefaultDepth + _loggerWriterDepth))
 	logFunc, err := levelToFunc(logger, level)
 	if err != nil {
@@ -116,11 +116,11 @@ func RedirectStdLog(l *Logger) func() {
 //
 // It returns a function to restore the original prefix and flags and reset the
 // standard library's output to os.Stderr.
-func RedirectStdLogAt(l *Logger, level zapcore.Level) (func(), error) {
+func RedirectStdLogAt(l *Logger, level ladcore.Level) (func(), error) {
 	return redirectStdLogAt(l, level)
 }
 
-func redirectStdLogAt(l *Logger, level zapcore.Level) (func(), error) {
+func redirectStdLogAt(l *Logger, level ladcore.Level) (func(), error) {
 	flags := log.Flags()
 	prefix := log.Prefix()
 	log.SetFlags(0)
@@ -138,7 +138,7 @@ func redirectStdLogAt(l *Logger, level zapcore.Level) (func(), error) {
 	}, nil
 }
 
-func levelToFunc(logger *Logger, lvl zapcore.Level) (func(string, ...Field), error) {
+func levelToFunc(logger *Logger, lvl ladcore.Level) (func(string, ...Field), error) {
 	switch lvl {
 	case DebugLevel:
 		return logger.Debug, nil

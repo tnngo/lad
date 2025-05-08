@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zap_test
+package lad_test
 
 import (
 	"bytes"
@@ -30,8 +30,8 @@ import (
 	"strings"
 	"testing"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"github.com/tnngo/lad"
+	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,12 +42,12 @@ import (
 // intended to match on the function name, while this is on the full output
 // which includes filenames.
 var _zapPackages = []string{
-	"go.uber.org/zap.",
-	"go.uber.org/zap/zapcore.",
+	"github.com/tnngo/lad.",
+	"github.com/tnngo/lad/ladcore.",
 }
 
 func TestStacktraceFiltersZapLog(t *testing.T) {
-	withLogger(t, func(logger *zap.Logger, out *bytes.Buffer) {
+	withLogger(t, func(logger *lad.Logger, out *bytes.Buffer) {
 		logger.Error("test log")
 		logger.Sugar().Error("sugar test log")
 
@@ -57,13 +57,13 @@ func TestStacktraceFiltersZapLog(t *testing.T) {
 }
 
 func TestStacktraceFiltersZapMarshal(t *testing.T) {
-	withLogger(t, func(logger *zap.Logger, out *bytes.Buffer) {
-		marshal := func(enc zapcore.ObjectEncoder) error {
+	withLogger(t, func(logger *lad.Logger, out *bytes.Buffer) {
+		marshal := func(enc ladcore.ObjectEncoder) error {
 			logger.Warn("marshal caused warn")
 			enc.AddString("f", "v")
 			return nil
 		}
-		logger.Error("test log", zap.Object("obj", zapcore.ObjectMarshalerFunc(marshal)))
+		logger.Error("test log", lad.Object("obj", ladcore.ObjectMarshalerFunc(marshal)))
 
 		logs := out.String()
 
@@ -95,7 +95,7 @@ func TestStacktraceFiltersVendorZap(t *testing.T) {
 		zapDir, err := os.Getwd()
 		require.NoError(t, err, "Failed to get current directory")
 
-		testDir := filepath.Join(goPath, "src/go.uber.org/zap_test/")
+		testDir := filepath.Join(goPath, "src/github.com/tnngo/lad_test/")
 		vendorDir := filepath.Join(testDir, "vendor")
 		require.NoError(t, os.MkdirAll(testDir, 0o777), "Failed to create source director")
 
@@ -103,7 +103,7 @@ func TestStacktraceFiltersVendorZap(t *testing.T) {
 		setupSymlink(t, curFile, filepath.Join(testDir, curFile))
 
 		// Set up symlinks for zap, and for any test dependencies.
-		setupSymlink(t, zapDir, filepath.Join(vendorDir, "go.uber.org/zap"))
+		setupSymlink(t, zapDir, filepath.Join(vendorDir, "github.com/tnngo/lad"))
 		for _, dep := range deps {
 			setupSymlink(t, dep.Dir, filepath.Join(vendorDir, dep.ImportPath))
 		}
@@ -120,7 +120,7 @@ func TestStacktraceFiltersVendorZap(t *testing.T) {
 }
 
 func TestStacktraceWithoutCallerSkip(t *testing.T) {
-	withLogger(t, func(logger *zap.Logger, out *bytes.Buffer) {
+	withLogger(t, func(logger *lad.Logger, out *bytes.Buffer) {
 		func() {
 			logger.Error("test log")
 		}()
@@ -131,8 +131,8 @@ func TestStacktraceWithoutCallerSkip(t *testing.T) {
 }
 
 func TestStacktraceWithCallerSkip(t *testing.T) {
-	withLogger(t, func(logger *zap.Logger, out *bytes.Buffer) {
-		logger = logger.WithOptions(zap.AddCallerSkip(2))
+	withLogger(t, func(logger *lad.Logger, out *bytes.Buffer) {
+		logger = logger.WithOptions(lad.AddCallerSkip(2))
 		func() {
 			logger.Error("test log")
 		}()
@@ -145,11 +145,11 @@ func TestStacktraceWithCallerSkip(t *testing.T) {
 
 // withLogger sets up a logger with a real encoder set up, so that any marshal functions are called.
 // The inbuilt observer does not call Marshal for objects/arrays, which we need for some tests.
-func withLogger(t *testing.T, fn func(logger *zap.Logger, out *bytes.Buffer)) {
+func withLogger(t *testing.T, fn func(logger *lad.Logger, out *bytes.Buffer)) {
 	buf := &bytes.Buffer{}
-	encoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-	core := zapcore.NewCore(encoder, zapcore.AddSync(buf), zapcore.DebugLevel)
-	logger := zap.New(core, zap.AddStacktrace(zap.DebugLevel))
+	encoder := ladcore.NewConsoleEncoder(lad.NewDevelopmentEncoderConfig())
+	core := ladcore.NewCore(encoder, ladcore.AddSync(buf), ladcore.DebugLevel)
+	logger := lad.New(core, lad.AddStacktrace(lad.DebugLevel))
 	fn(logger, buf)
 }
 

@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zap
+package lad
 
 import (
 	"errors"
@@ -30,7 +30,7 @@ import (
 	"strings"
 	"sync"
 
-	"go.uber.org/zap/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 const schemeFile = "file"
@@ -39,7 +39,7 @@ var _sinkRegistry = newSinkRegistry()
 
 // Sink defines the interface to write to and close logger destinations.
 type Sink interface {
-	zapcore.WriteSyncer
+	ladcore.WriteSyncer
 	io.Closer
 }
 
@@ -51,7 +51,7 @@ func (e *errSinkNotFound) Error() string {
 	return fmt.Sprintf("no sink found for scheme %q", e.scheme)
 }
 
-type nopCloserSink struct{ zapcore.WriteSyncer }
+type nopCloserSink struct{ ladcore.WriteSyncer }
 
 func (nopCloserSink) Close() error { return nil }
 

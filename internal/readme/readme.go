@@ -37,7 +37,7 @@ import (
 
 var libraryNameToMarkdownName = map[string]string{
 	"Zap":                   ":zap: zap",
-	"Zap.Sugar":             ":zap: zap (sugared)",
+	"lad.Sugar":             ":zap: zap (sugared)",
 	"stdlib.Println":        "standard library",
 	"sirupsen/logrus":       "logrus",
 	"go-kit/kit/log":        "go-kit",

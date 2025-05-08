@@ -13,7 +13,7 @@ Blazing fast, structured, leveled logging in Go.
 
 ## Installation
 
-`go get -u go.uber.org/zap`
+`go get -u github.com/tnngo/lad`
 
 Note that zap only supports the two most recent minor versions of Go.
 
@@ -24,7 +24,7 @@ In contexts where performance is nice, but not critical, use the
 packages and includes both structured and `printf`-style APIs.
 
 ```go
-logger, _ := zap.NewProduction()
+logger, _ := lad.NewProduction()
 defer logger.Sync() // flushes buffer, if any
 sugar := logger.Sugar()
 sugar.Infow("failed to fetch URL",
@@ -41,13 +41,13 @@ faster than the `SugaredLogger` and allocates far less, but it only supports
 structured logging.
 
 ```go
-logger, _ := zap.NewProduction()
+logger, _ := lad.NewProduction()
 defer logger.Sync()
 logger.Info("failed to fetch URL",
   // Structured context as strongly typed Field values.
-  zap.String("url", url),
-  zap.Int("attempt", 3),
-  zap.Duration("backoff", time.Second),
+  lad.String("url", url),
+  lad.Int("attempt", 3),
+  lad.Duration("backoff", time.Second),
 )
 ```
 
@@ -138,8 +138,8 @@ Released under the [MIT License](LICENSE).
 benchmarking against slightly older versions of other packages. Versions are
 pinned in the [benchmarks/go.mod][] file. [↩](#anchor-versions)
 
-[doc-img]: https://pkg.go.dev/badge/go.uber.org/zap
-[doc]: https://pkg.go.dev/go.uber.org/zap
+[doc-img]: https://pkg.go.dev/badge/github.com/tnngo/lad
+[doc]: https://pkg.go.dev/github.com/tnngo/lad
 [ci-img]: https://github.com/uber-go/zap/actions/workflows/go.yml/badge.svg
 [ci]: https://github.com/uber-go/zap/actions/workflows/go.yml
 [cov-img]: https://codecov.io/gh/uber-go/zap/branch/master/graph/badge.svg

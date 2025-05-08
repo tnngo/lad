@@ -18,12 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package zap
+package lad
 
 import (
 	"fmt"
 
-	"go.uber.org/zap/zapcore"
+	"github.com/tnngo/lad/ladcore"
 )
 
 // An Option configures a Logger.
@@ -38,8 +38,8 @@ func (f optionFunc) apply(log *Logger) {
 	f(log)
 }
 
-// WrapCore wraps or replaces the Logger's underlying zapcore.Core.
-func WrapCore(f func(zapcore.Core) zapcore.Core) Option {
+// WrapCore wraps or replaces the Logger's underlying ladcore.Core.
+func WrapCore(f func(ladcore.Core) ladcore.Core) Option {
 	return optionFunc(func(log *Logger) {
 		log.core = f(log.core)
 	})
@@ -51,10 +51,10 @@ func WrapCore(f func(zapcore.Core) zapcore.Core) Option {
 // Hooks are useful for simple side effects, like capturing metrics for the
 // number of emitted logs. More complex side effects, including anything that
 // requires access to the Entry's structured fields, should be implemented as
-// a zapcore.Core instead. See zapcore.RegisterHooks for details.
-func Hooks(hooks ...func(zapcore.Entry) error) Option {
+// a ladcore.Core instead. See ladcore.RegisterHooks for details.
+func Hooks(hooks ...func(ladcore.Entry) error) Option {
 	return optionFunc(func(log *Logger) {
-		log.core = zapcore.RegisterHooks(log.core, hooks...)
+		log.core = ladcore.RegisterHooks(log.core, hooks...)
 	})
 }
 
@@ -71,8 +71,8 @@ func Fields(fs ...Field) Option {
 // see the package-level AdvancedConfiguration example.
 //
 // The supplied WriteSyncer must be safe for concurrent use. The Open and
-// zapcore.Lock functions are the simplest ways to protect files with a mutex.
-func ErrorOutput(w zapcore.WriteSyncer) Option {
+// ladcore.Lock functions are the simplest ways to protect files with a mutex.
+func ErrorOutput(w ladcore.WriteSyncer) Option {
 	return optionFunc(func(log *Logger) {
 		log.errorOutput = w
 	})
@@ -113,7 +113,7 @@ func AddCallerSkip(skip int) Option {
 
 // AddStacktrace configures the Logger to record a stack trace for all messages at
 // or above a given level.
-func AddStacktrace(lvl zapcore.LevelEnabler) Option {
+func AddStacktrace(lvl ladcore.LevelEnabler) Option {
 	return optionFunc(func(log *Logger) {
 		log.addStack = lvl
 	})
@@ -121,9 +121,9 @@ func AddStacktrace(lvl zapcore.LevelEnabler) Option {
 
 // IncreaseLevel increase the level of the logger. It has no effect if
 // the passed in level tries to decrease the level of the logger.
-func IncreaseLevel(lvl zapcore.LevelEnabler) Option {
+func IncreaseLevel(lvl ladcore.LevelEnabler) Option {
 	return optionFunc(func(log *Logger) {
-		core, err := zapcore.NewIncreaseLevelCore(log.core, lvl)
+		core, err := ladcore.NewIncreaseLevelCore(log.core, lvl)
 		if err != nil {
 			_, _ = fmt.Fprintf(
 				log.errorOutput,
@@ -142,10 +142,10 @@ func IncreaseLevel(lvl zapcore.LevelEnabler) Option {
 // For example, the following builds a logger that will exit the current
 // goroutine after writing a Panic/DPanic log message, but it will not start a panic.
 //
-//	zap.New(core, zap.WithPanicHook(zapcore.WriteThenGoexit))
+//	lad.New(core, lad.WithPanicHook(ladcore.WriteThenGoexit))
 //
 // This is useful for testing Panic/DPanic log output.
-func WithPanicHook(hook zapcore.CheckWriteHook) Option {
+func WithPanicHook(hook ladcore.CheckWriteHook) Option {
 	return optionFunc(func(log *Logger) {
 		log.onPanic = hook
 	})
@@ -154,7 +154,7 @@ func WithPanicHook(hook zapcore.CheckWriteHook) Option {
 // OnFatal sets the action to take on fatal logs.
 //
 // Deprecated: Use [WithFatalHook] instead.
-func OnFatal(action zapcore.CheckWriteAction) Option {
+func OnFatal(action ladcore.CheckWriteAction) Option {
 	return WithFatalHook(action)
 }
 
@@ -165,13 +165,13 @@ func OnFatal(action zapcore.CheckWriteAction) Option {
 // goroutine after writing a fatal log message, but it will not exit the
 // program.
 //
-//	zap.New(core, zap.WithFatalHook(zapcore.WriteThenGoexit))
+//	lad.New(core, lad.WithFatalHook(ladcore.WriteThenGoexit))
 //
 // It is important that the provided CheckWriteHook stops the control flow at
 // the current statement to meet expectations of callers of the logger.
 // We recommend calling os.Exit or runtime.Goexit inside custom hooks at
 // minimum.
-func WithFatalHook(hook zapcore.CheckWriteHook) Option {
+func WithFatalHook(hook ladcore.CheckWriteHook) Option {
 	return optionFunc(func(log *Logger) {
 		log.onFatal = hook
 	})
@@ -179,7 +179,7 @@ func WithFatalHook(hook zapcore.CheckWriteHook) Option {
 
 // WithClock specifies the clock used by the logger to determine the current
 // time for logged entries. Defaults to the system clock with time.Now.
-func WithClock(clock zapcore.Clock) Option {
+func WithClock(clock ladcore.Clock) Option {
 	return optionFunc(func(log *Logger) {
 		log.clock = clock
 	})
