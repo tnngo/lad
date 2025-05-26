@@ -24,8 +24,8 @@ import (
 	"testing"
 
 	"github.com/tnngo/lad/internal/ztest"
-	//revive:disable:dot-imports
 	. "github.com/tnngo/lad/ladcore"
+	//revive:disable:dot-imports
 )
 
 func withBenchedTee(b *testing.B, f func(Core)) {

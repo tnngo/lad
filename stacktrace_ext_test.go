@@ -30,7 +30,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tnngo/lad"
+	zap "github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
@@ -47,7 +47,7 @@ var _zapPackages = []string{
 }
 
 func TestStacktraceFiltersZapLog(t *testing.T) {
-	withLogger(t, func(logger *lad.Logger, out *bytes.Buffer) {
+	withLogger(t, func(logger *zap.Logger, out *bytes.Buffer) {
 		logger.Error("test log")
 		logger.Sugar().Error("sugar test log")
 
@@ -57,13 +57,13 @@ func TestStacktraceFiltersZapLog(t *testing.T) {
 }
 
 func TestStacktraceFiltersZapMarshal(t *testing.T) {
-	withLogger(t, func(logger *lad.Logger, out *bytes.Buffer) {
+	withLogger(t, func(logger *zap.Logger, out *bytes.Buffer) {
 		marshal := func(enc ladcore.ObjectEncoder) error {
 			logger.Warn("marshal caused warn")
 			enc.AddString("f", "v")
 			return nil
 		}
-		logger.Error("test log", lad.Object("obj", ladcore.ObjectMarshalerFunc(marshal)))
+		logger.Error("test log", zap.Object("obj", ladcore.ObjectMarshalerFunc(marshal)))
 
 		logs := out.String()
 
@@ -95,7 +95,7 @@ func TestStacktraceFiltersVendorZap(t *testing.T) {
 		zapDir, err := os.Getwd()
 		require.NoError(t, err, "Failed to get current directory")
 
-		testDir := filepath.Join(goPath, "src/github.com/tnngo/lad_test/")
+		testDir := filepath.Join(goPath, "src/go.uber.org/zap_test/")
 		vendorDir := filepath.Join(testDir, "vendor")
 		require.NoError(t, os.MkdirAll(testDir, 0o777), "Failed to create source director")
 
@@ -120,7 +120,7 @@ func TestStacktraceFiltersVendorZap(t *testing.T) {
 }
 
 func TestStacktraceWithoutCallerSkip(t *testing.T) {
-	withLogger(t, func(logger *lad.Logger, out *bytes.Buffer) {
+	withLogger(t, func(logger *zap.Logger, out *bytes.Buffer) {
 		func() {
 			logger.Error("test log")
 		}()
@@ -131,8 +131,8 @@ func TestStacktraceWithoutCallerSkip(t *testing.T) {
 }
 
 func TestStacktraceWithCallerSkip(t *testing.T) {
-	withLogger(t, func(logger *lad.Logger, out *bytes.Buffer) {
-		logger = logger.WithOptions(lad.AddCallerSkip(2))
+	withLogger(t, func(logger *zap.Logger, out *bytes.Buffer) {
+		logger = logger.WithOptions(zap.AddCallerSkip(2))
 		func() {
 			logger.Error("test log")
 		}()
@@ -145,11 +145,11 @@ func TestStacktraceWithCallerSkip(t *testing.T) {
 
 // withLogger sets up a logger with a real encoder set up, so that any marshal functions are called.
 // The inbuilt observer does not call Marshal for objects/arrays, which we need for some tests.
-func withLogger(t *testing.T, fn func(logger *lad.Logger, out *bytes.Buffer)) {
+func withLogger(t *testing.T, fn func(logger *zap.Logger, out *bytes.Buffer)) {
 	buf := &bytes.Buffer{}
-	encoder := ladcore.NewConsoleEncoder(lad.NewDevelopmentEncoderConfig())
+	encoder := ladcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
 	core := ladcore.NewCore(encoder, ladcore.AddSync(buf), ladcore.DebugLevel)
-	logger := lad.New(core, lad.AddStacktrace(lad.DebugLevel))
+	logger := zap.New(core, zap.AddStacktrace(zap.DebugLevel))
 	fn(logger, buf)
 }
 

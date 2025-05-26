@@ -34,7 +34,7 @@ type LoggerOption interface {
 
 type loggerOptions struct {
 	Level      ladcore.LevelEnabler
-	zapOptions []lad.Option
+	ladOptions []lad.Option
 }
 
 type loggerOptionFunc func(*loggerOptions)
@@ -52,9 +52,9 @@ func Level(enab ladcore.LevelEnabler) LoggerOption {
 }
 
 // WrapOptions adds lad.Option's to a test Logger built by NewLogger.
-func WrapOptions(zapOpts ...lad.Option) LoggerOption {
+func WrapOptions(ladOpts ...lad.Option) LoggerOption {
 	return loggerOptionFunc(func(opts *loggerOptions) {
-		opts.zapOptions = zapOpts
+		opts.ladOptions = ladOpts
 	})
 }
 
@@ -83,12 +83,12 @@ func NewLogger(t TestingT, opts ...LoggerOption) *lad.Logger {
 	}
 
 	writer := NewTestingWriter(t)
-	zapOptions := []lad.Option{
+	ladOptions := []lad.Option{
 		// Send zap errors to the same writer and mark the test as failed if
 		// that happens.
 		lad.ErrorOutput(writer.WithMarkFailed(true)),
 	}
-	zapOptions = append(zapOptions, cfg.zapOptions...)
+	ladOptions = append(ladOptions, cfg.ladOptions...)
 
 	return lad.New(
 		ladcore.NewCore(
@@ -96,7 +96,7 @@ func NewLogger(t TestingT, opts ...LoggerOption) *lad.Logger {
 			writer,
 			cfg.Level,
 		),
-		zapOptions...,
+		ladOptions...,
 	)
 }
 
@@ -112,18 +112,18 @@ type TestingWriter struct {
 // NewTestingWriter builds a new TestingWriter that writes to the given
 // testing.TB.
 //
-// Use this if you need more flexibility when creating *lad.Logger
-// than ladtest.NewLogger() provides.
+// Use this if you need more flexibility when creating *zap.Logger
+// than zaptest.NewLogger() provides.
 //
-// E.g., if you want to use custom core with ladtest.TestingWriter:
+// E.g., if you want to use custom core with zaptest.TestingWriter:
 //
 //	encoder := newCustomEncoder()
-//	writer := ladtest.NewTestingWriter(t)
-//	level := lad.NewAtomicLevelAt(ladcore.DebugLevel)
+//	writer := zaptest.NewTestingWriter(t)
+//	level := zap.NewAtomicLevelAt(zapcore.DebugLevel)
 //
 //	core := newCustomCore(encoder, writer, level)
 //
-//	logger := lad.New(core, lad.AddCaller())
+//	logger := zap.New(core, zap.AddCaller())
 func NewTestingWriter(t TestingT) TestingWriter {
 	return TestingWriter{t: t}
 }

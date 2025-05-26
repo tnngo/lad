@@ -23,8 +23,8 @@ package ladcore_test
 import (
 	"testing"
 
-	//revive:disable:dot-imports
 	. "github.com/tnngo/lad/ladcore"
+	//revive:disable:dot-imports
 )
 
 func BenchmarkZapConsole(b *testing.B) {

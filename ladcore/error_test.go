@@ -27,10 +27,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"go.uber.org/multierr"
-	//revive:disable:dot-imports
 	. "github.com/tnngo/lad/ladcore"
+	"go.uber.org/multierr"
 )
 
 type errTooManyUsers int

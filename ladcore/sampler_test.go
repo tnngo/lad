@@ -29,9 +29,10 @@ import (
 	"time"
 
 	"github.com/tnngo/lad/internal/ztest"
-	//revive:disable:dot-imports
 	. "github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/ladtest/observer"
+
+	//revive:disable:dot-imports
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

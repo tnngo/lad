@@ -21,6 +21,7 @@
 package lad
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -675,7 +676,7 @@ func TestLoggerAddCallerFunction(t *testing.T) {
 		{
 			options:         opts(AddCaller()),
 			loggerFunction:  "github.com/tnngo/lad.infoLog",
-			sugaredFunction: "github.com/tlad./lad.infoLogSugared",
+			sugaredFunction: "github.com/tnngo/lad.infoLogSugared",
 		},
 		{
 			options:         opts(AddCaller(), WithCaller(false)),
@@ -684,8 +685,8 @@ func TestLoggerAddCallerFunction(t *testing.T) {
 		},
 		{
 			options:         opts(WithCaller(true)),
-			loggerFunction:  "github.com/tlad./lad.infoLog",
-			sugaredFunction: "github.com/tlad./lad.infoLogSugared",
+			loggerFunction:  "github.com/tnngo/lad.infoLog",
+			sugaredFunction: "github.com/tnngo/lad.infoLogSugared",
 		},
 		{
 			options:         opts(WithCaller(true), WithCaller(false)),
@@ -694,13 +695,13 @@ func TestLoggerAddCallerFunction(t *testing.T) {
 		},
 		{
 			options:         opts(AddCaller(), AddCallerSkip(1), AddCallerSkip(-1)),
-			loggerFunction:  "github.com/tlad./lad.infoLog",
-			sugaredFunction: "github.com/tlad./lad.infoLogSugared",
+			loggerFunction:  "github.com/tnngo/lad.infoLog",
+			sugaredFunction: "github.com/tnngo/lad.infoLogSugared",
 		},
 		{
 			options:         opts(AddCaller(), AddCallerSkip(2)),
-			loggerFunction:  "github.com/tlad./lad.withLogger",
-			sugaredFunction: "github.com/tlad./lad.withLogger",
+			loggerFunction:  "github.com/tnngo/lad.withLogger",
+			sugaredFunction: "github.com/tnngo/lad.withLogger",
 		},
 		{
 			options:         opts(AddCaller(), AddCallerSkip(2), AddCallerSkip(3)),
@@ -1058,4 +1059,36 @@ func infoLog(logger *Logger, msg string, fields ...Field) {
 
 func infoLogSugared(logger *SugaredLogger, args ...interface{}) {
 	logger.Info(args...)
+}
+
+func TestLadContext(t *testing.T) {
+	type key string
+
+	const (
+		requestID key = "request_id"
+	)
+
+	t.Run("Context option use while logger create", func(t *testing.T) {
+		t.Run("Context is not nil", func(t *testing.T) {
+			defineContext := Context(func(ctx context.Context) []Field {
+				var fields []Field
+
+				if dc, ok := ctx.Value(requestID).(string); ok {
+					fields = append(fields, String(string(requestID), dc))
+				}
+
+				return fields
+			})
+			logger, _ := NewDevelopment(defineContext)
+
+			ctx := context.TODO()
+			ctx = context.WithValue(ctx, requestID, "123456789")
+
+			logMessage := "tnngo"
+
+			logger.WithContext(ctx).Info(logMessage)
+			logger.WithContext(ctx).Debug("1")
+			logger.Sugar().WithContext(ctx).Debug(2)
+		})
+	})
 }

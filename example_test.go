@@ -32,7 +32,7 @@ import (
 )
 
 func Example_presets() {
-	// Using zap's preset constructors is the simplest way to get a feel for the
+	// Using lad's preset constructors is the simplest way to get a feel for the
 	// package, but they don't allow much customization.
 	logger := lad.NewExample() // or NewProduction, or NewDevelopment
 	defer logger.Sync()
@@ -102,7 +102,7 @@ func Example_basicConfiguration() {
 func Example_advancedConfiguration() {
 	// The bundled Config struct only supports the most common configuration
 	// options. More complex needs, like splitting logs between multiple files
-	// or writing to non-file outputs, require use of the zapcore package.
+	// or writing to non-file outputs, require use of the ladcore package.
 	//
 	// In this example, imagine we're both sending our logs to Kafka and writing
 	// them to the console. We'd like to encode the console output and the Kafka
@@ -230,9 +230,9 @@ func ExampleReplaceGlobals() {
 	undo := lad.ReplaceGlobals(logger)
 	defer undo()
 
-	lad.L().Info("replaced zap's global loggers")
+	lad.L().Info("replaced lad's global loggers")
 	// Output:
-	// {"level":"info","msg":"replaced zap's global loggers"}
+	// {"level":"info","msg":"replaced lad's global loggers"}
 }
 
 func ExampleAtomicLevel() {
@@ -291,7 +291,7 @@ func ExampleLogger_Check() {
 	defer logger.Sync()
 
 	if ce := logger.Check(lad.DebugLevel, "debugging"); ce != nil {
-		// If debug-level log output isn't enabled or if zap's sampling would have
+		// If debug-level log output isn't enabled or if lad's sampling would have
 		// dropped this log entry, we don't allocate the slice that holds these
 		// fields.
 		ce.Write(
@@ -386,51 +386,6 @@ func ExampleObjects() {
 		}))
 	// Output:
 	// {"level":"debug","msg":"opening connections","addrs":[{"ip":"123.45.67.89","port":4040},{"ip":"127.0.0.1","port":4041},{"ip":"192.168.0.1","port":4042}]}
-}
-
-func ExampleDictObject() {
-	logger := lad.NewExample()
-	defer logger.Sync()
-
-	// Use DictObject to create ladcore.ObjectMarshaler implementations from Field arrays,
-	// then use the Object and Objects field constructors to turn them back into a Field.
-
-	logger.Debug("worker received job",
-		lad.Object("w1",
-			lad.DictObject(
-				lad.Int("id", 402000),
-				lad.String("description", "compress image data"),
-				lad.Int("priority", 3),
-			),
-		))
-
-	d1 := 68 * time.Millisecond
-	d2 := 79 * time.Millisecond
-	d3 := 57 * time.Millisecond
-
-	logger.Info("worker status checks",
-		lad.Objects("job batch enqueued",
-			[]ladcore.ObjectMarshaler{
-				lad.DictObject(
-					lad.String("worker", "w1"),
-					lad.Int("load", 419),
-					lad.Duration("latency", d1),
-				),
-				lad.DictObject(
-					lad.String("worker", "w2"),
-					lad.Int("load", 520),
-					lad.Duration("latency", d2),
-				),
-				lad.DictObject(
-					lad.String("worker", "w3"),
-					lad.Int("load", 310),
-					lad.Duration("latency", d3),
-				),
-			},
-		))
-	// Output:
-	// {"level":"debug","msg":"worker received job","w1":{"id":402000,"description":"compress image data","priority":3}}
-	// {"level":"info","msg":"worker status checks","job batch enqueued":[{"worker":"w1","load":419,"latency":"68ms"},{"worker":"w2","load":520,"latency":"79ms"},{"worker":"w3","load":310,"latency":"57ms"}]}
 }
 
 func ExampleObjectValues() {

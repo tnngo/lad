@@ -8,7 +8,13 @@ GOVULNCHECK = $(GOBIN)/govulncheck
 BENCH_FLAGS ?= -cpuprofile=cpu.pprof -memprofile=mem.pprof -benchmem
 
 # Directories containing independent Go modules.
-MODULE_DIRS = . ./exp ./benchmarks ./ladgrpc/internal/test
+<<<<<<< HEAD
+#
+# We track coverage only for the main module.
+MODULE_DIRS = . ./benchmarks ./ladgrpc/internal/test
+=======
+MODULE_DIRS = . ./exp ./benchmarks ./zapgrpc/internal/test
+>>>>>>> 87577d85d58b6d92d0158967df29303d04d30e36
 
 # Directories that we want to track coverage for.
 COVER_DIRS = . ./exp
@@ -24,7 +30,7 @@ golangci-lint:
 	@$(foreach mod,$(MODULE_DIRS), \
 		(cd $(mod) && \
 		echo "[lint] golangci-lint: $(mod)" && \
-		golangci-lint run --path-prefix $(mod) ./...) &&) true
+		golangci-lint run --path-prefix $(mod)) &&) true
 
 .PHONY: tidy
 tidy:

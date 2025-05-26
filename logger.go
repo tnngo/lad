@@ -21,6 +21,7 @@
 package lad
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -54,6 +55,8 @@ type Logger struct {
 	callerSkip int
 
 	clock ladcore.Clock
+
+	contextFunc func(ctx context.Context) []Field
 }
 
 // New constructs a new Logger from the provided ladcore.Core and Options. If
@@ -113,7 +116,7 @@ func NewDevelopment(options ...Option) (*Logger, error) {
 // and panics if the error is non-nil. It is intended for use in variable
 // initialization such as:
 //
-//	var logger = lad.Must(lad.NewProduction())
+//	var logger = zap.Must(zap.NewProduction())
 func Must(logger *Logger, err error) *Logger {
 	if err != nil {
 		panic(err)
@@ -381,11 +384,7 @@ func (log *Logger) check(lvl ladcore.Level, msg string) *ladcore.CheckedEntry {
 
 	if stack.Count() == 0 {
 		if log.addCaller {
-			_, _ = fmt.Fprintf(
-				log.errorOutput,
-				"%v Logger.check error: failed to get caller\n",
-				ent.Time.UTC(),
-			)
+			fmt.Fprintf(log.errorOutput, "%v Logger.check error: failed to get caller\n", ent.Time.UTC())
 			_ = log.errorOutput.Sync()
 		}
 		return ce
@@ -421,13 +420,23 @@ func (log *Logger) check(lvl ladcore.Level, msg string) *ladcore.CheckedEntry {
 	return ce
 }
 
+func (log *Logger) WithContext(ctx context.Context) *Logger {
+	if ctx != nil && log.contextFunc != nil {
+		l := log.clone()
+		contextFields := log.contextFunc(ctx)
+		l.core = l.core.With(contextFields)
+		return l
+	} else {
+		return log
+	}
+}
 func terminalHookOverride(defaultHook, override ladcore.CheckWriteHook) ladcore.CheckWriteHook {
 	// A nil or WriteThenNoop hook will lead to continued execution after
 	// a Panic or Fatal log entry, which is unexpected. For example,
 	//
 	//   f, err := os.Open(..)
 	//   if err != nil {
-	//     log.Fatal("cannot open", lad.Error(err))
+	//     log.Fatal("cannot open", zap.Error(err))
 	//   }
 	//   fmt.Println(f.Name())
 	//

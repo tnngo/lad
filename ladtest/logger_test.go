@@ -27,7 +27,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tnngo/lad"
+	zap "github.com/tnngo/lad"
 	"github.com/tnngo/lad/internal/ztest"
 	"github.com/tnngo/lad/ladcore"
 
@@ -43,7 +43,7 @@ func TestTestLogger(t *testing.T) {
 	log.Info("received work order")
 	log.Debug("starting work")
 	log.Warn("work may fail")
-	log.Error("work failed", lad.Error(errors.New("great sadness")))
+	log.Error("work failed", zap.Error(errors.New("great sadness")))
 
 	assert.Panics(t, func() {
 		log.Panic("failed to do work")
@@ -62,12 +62,12 @@ func TestTestLoggerSupportsLevels(t *testing.T) {
 	ts := newTestLogSpy(t)
 	defer ts.AssertPassed()
 
-	log := NewLogger(ts, Level(lad.WarnLevel))
+	log := NewLogger(ts, Level(zap.WarnLevel))
 
 	log.Info("received work order")
 	log.Debug("starting work")
 	log.Warn("work may fail")
-	log.Error("work failed", lad.Error(errors.New("great sadness")))
+	log.Error("work failed", zap.Error(errors.New("great sadness")))
 
 	assert.Panics(t, func() {
 		log.Panic("failed to do work")
@@ -84,12 +84,12 @@ func TestTestLoggerSupportsWrappedZapOptions(t *testing.T) {
 	ts := newTestLogSpy(t)
 	defer ts.AssertPassed()
 
-	log := NewLogger(ts, WrapOptions(lad.AddCaller(), lad.Fields(lad.String("k1", "v1"))))
+	log := NewLogger(ts, WrapOptions(zap.AddCaller(), zap.Fields(zap.String("k1", "v1"))))
 
 	log.Info("received work order")
 	log.Debug("starting work")
 	log.Warn("work may fail")
-	log.Error("work failed", lad.Error(errors.New("great sadness")))
+	log.Error("work failed", zap.Error(errors.New("great sadness")))
 
 	assert.Panics(t, func() {
 		log.Panic("failed to do work")
@@ -123,9 +123,9 @@ func TestTestLoggerErrorOutput(t *testing.T) {
 	log := NewLogger(ts)
 
 	// Replace with a core that fails.
-	log = log.WithOptions(lad.WrapCore(func(ladcore.Core) ladcore.Core {
+	log = log.WithOptions(zap.WrapCore(func(ladcore.Core) ladcore.Core {
 		return ladcore.NewCore(
-			ladcore.NewConsoleEncoder(lad.NewDevelopmentEncoderConfig()),
+			ladcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
 			ladcore.Lock(ladcore.AddSync(ztest.FailWriter{})),
 			ladcore.DebugLevel,
 		)

@@ -23,7 +23,7 @@ package observer
 import (
 	"testing"
 
-	"github.com/tnngo/lad"
+	zap "github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
@@ -43,8 +43,8 @@ func TestLoggedEntryContextMap(t *testing.T) {
 		{
 			msg: "simple",
 			fields: []ladcore.Field{
-				lad.String("k1", "v"),
-				lad.Int64("k2", 10),
+				zap.String("k1", "v"),
+				zap.Int64("k2", 10),
 			},
 			want: map[string]interface{}{
 				"k1": "v",
@@ -54,8 +54,8 @@ func TestLoggedEntryContextMap(t *testing.T) {
 		{
 			msg: "overwrite",
 			fields: []ladcore.Field{
-				lad.String("k1", "v1"),
-				lad.String("k1", "v2"),
+				zap.String("k1", "v1"),
+				zap.String("k1", "v2"),
 			},
 			want: map[string]interface{}{
 				"k1": "v2",
@@ -64,9 +64,9 @@ func TestLoggedEntryContextMap(t *testing.T) {
 		{
 			msg: "nested",
 			fields: []ladcore.Field{
-				lad.String("k1", "v1"),
-				lad.Namespace("nested"),
-				lad.String("k2", "v2"),
+				zap.String("k1", "v1"),
+				zap.Namespace("nested"),
+				zap.String("k2", "v2"),
 			},
 			want: map[string]interface{}{
 				"k1": "v1",

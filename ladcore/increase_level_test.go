@@ -26,11 +26,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tnngo/lad"
-
-	//revive:disable:dot-imports
+	zap "github.com/tnngo/lad"
 	. "github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/ladtest/observer"
+	//revive:disable:dot-imports
 )
 
 func TestIncreaseLevel(t *testing.T) {
@@ -56,7 +55,7 @@ func TestIncreaseLevel(t *testing.T) {
 		{
 			coreLevel:     InfoLevel,
 			increaseLevel: ErrorLevel,
-			with:          []Field{lad.String("k", "v")},
+			with:          []Field{zap.String("k", "v")},
 		},
 		{
 			coreLevel:     ErrorLevel,

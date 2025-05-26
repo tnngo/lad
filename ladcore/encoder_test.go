@@ -30,7 +30,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 
-	//revive:disable:dot-imports
 	. "github.com/tnngo/lad/ladcore"
 )
 

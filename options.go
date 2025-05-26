@@ -21,6 +21,7 @@
 package lad
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/tnngo/lad/ladcore"
@@ -125,11 +126,7 @@ func IncreaseLevel(lvl ladcore.LevelEnabler) Option {
 	return optionFunc(func(log *Logger) {
 		core, err := ladcore.NewIncreaseLevelCore(log.core, lvl)
 		if err != nil {
-			_, _ = fmt.Fprintf(
-				log.errorOutput,
-				"failed to IncreaseLevel: %v\n",
-				err,
-			)
+			fmt.Fprintf(log.errorOutput, "failed to IncreaseLevel: %v\n", err)
 		} else {
 			log.core = core
 		}
@@ -142,7 +139,7 @@ func IncreaseLevel(lvl ladcore.LevelEnabler) Option {
 // For example, the following builds a logger that will exit the current
 // goroutine after writing a Panic/DPanic log message, but it will not start a panic.
 //
-//	lad.New(core, lad.WithPanicHook(ladcore.WriteThenGoexit))
+//	zap.New(core, zap.WithPanicHook(ladcore.WriteThenGoexit))
 //
 // This is useful for testing Panic/DPanic log output.
 func WithPanicHook(hook ladcore.CheckWriteHook) Option {
@@ -165,7 +162,7 @@ func OnFatal(action ladcore.CheckWriteAction) Option {
 // goroutine after writing a fatal log message, but it will not exit the
 // program.
 //
-//	lad.New(core, lad.WithFatalHook(ladcore.WriteThenGoexit))
+//	zap.New(core, zap.WithFatalHook(ladcore.WriteThenGoexit))
 //
 // It is important that the provided CheckWriteHook stops the control flow at
 // the current statement to meet expectations of callers of the logger.
@@ -182,5 +179,11 @@ func WithFatalHook(hook ladcore.CheckWriteHook) Option {
 func WithClock(clock ladcore.Clock) Option {
 	return optionFunc(func(log *Logger) {
 		log.clock = clock
+	})
+}
+
+func Context(contextFunc func(ctx context.Context) []Field) Option {
+	return optionFunc(func(log *Logger) {
+		log.contextFunc = contextFunc
 	})
 }

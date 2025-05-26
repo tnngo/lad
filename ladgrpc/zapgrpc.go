@@ -18,13 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// package ladgrpc provides a logger that is compatible with grpclog.
+// Package ladgrpc provides a logger that is compatible with grpclog.
 package ladgrpc // import "github.com/tnngo/lad/ladgrpc"
 
 import (
 	"fmt"
 
-	"github.com/tnngo/lad"
+	zap "github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
 )
 
@@ -37,7 +37,7 @@ const (
 )
 
 // _grpcToZapLevel maps gRPC log levels to zap log levels.
-// See https://pkg.go.dev/github.com/tnngo/lad@v1.16.0/zapcore#Level
+// See https://pkg.go.dev/go.uber.org/zap@v1.16.0/zapcore#Level
 var _grpcToZapLevel = map[int]ladcore.Level{
 	grpcLvlInfo:  ladcore.InfoLevel,
 	grpcLvlWarn:  ladcore.WarnLevel,
@@ -86,7 +86,7 @@ func withWarn() Option {
 }
 
 // NewLogger returns a new Logger.
-func NewLogger(l *lad.Logger, options ...Option) *Logger {
+func NewLogger(l *zap.Logger, options ...Option) *Logger {
 	logger := &Logger{
 		delegate:     l.Sugar(),
 		levelEnabler: l.Core(),
@@ -136,7 +136,7 @@ func (v *printer) Println(args ...interface{}) {
 
 // Logger adapts zap's Logger to be compatible with grpclog.LoggerV2 and the deprecated grpclog.Logger.
 type Logger struct {
-	delegate     *lad.SugaredLogger
+	delegate     *zap.SugaredLogger
 	levelEnabler ladcore.LevelEnabler
 	print        *printer
 	fatal        *printer

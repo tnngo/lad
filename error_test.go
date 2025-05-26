@@ -25,9 +25,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/tnngo/lad/ladcore"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tnngo/lad/ladcore"
 )
 
 func TestErrorConstructors(t *testing.T) {

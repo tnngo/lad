@@ -96,7 +96,7 @@ func Int8s(key string, nums []int8) Field {
 }
 
 // Objects constructs a field with the given key, holding a list of the
-// provided objects that can be marshaled by lad.
+// provided objects that can be marshaled by Zap.
 //
 // Note that these objects must implement ladcore.ObjectMarshaler directly.
 // That is, if you're trying to marshal a []Request, the MarshalLogObject
@@ -110,7 +110,7 @@ func Int8s(key string, nums []int8) Field {
 //	func (a Author) MarshalLogObject(enc ladcore.ObjectEncoder) error
 //
 //	var authors []Author = ...
-//	logger.Info("loading article", lad.Objects("authors", authors))
+//	logger.Info("loading article", zap.Objects("authors", authors))
 //
 // Similarly, given a type that implements MarshalLogObject on its pointer
 // receiver, you can log a slice of pointers to that object with Objects like
@@ -120,13 +120,13 @@ func Int8s(key string, nums []int8) Field {
 //	func (r *Request) MarshalLogObject(enc ladcore.ObjectEncoder) error
 //
 //	var requests []*Request = ...
-//	logger.Info("sending requests", lad.Objects("requests", requests))
+//	logger.Info("sending requests", zap.Objects("requests", requests))
 //
 // If instead, you have a slice of values of such an object, use the
 // ObjectValues constructor.
 //
 //	var requests []Request = ...
-//	logger.Info("sending requests", lad.ObjectValues("requests", requests))
+//	logger.Info("sending requests", zap.ObjectValues("requests", requests))
 func Objects[T ladcore.ObjectMarshaler](key string, values []T) Field {
 	return Array(key, objects[T](values))
 }
@@ -150,7 +150,7 @@ type ObjectMarshalerPtr[T any] interface {
 }
 
 // ObjectValues constructs a field with the given key, holding a list of the
-// provided objects, where pointers to these objects can be marshaled by lad.
+// provided objects, where pointers to these objects can be marshaled by Zap.
 //
 // Note that pointers to these objects must implement ladcore.ObjectMarshaler.
 // That is, if you're trying to marshal a []Request, the MarshalLogObject
@@ -164,13 +164,13 @@ type ObjectMarshalerPtr[T any] interface {
 //	func (r *Request) MarshalLogObject(enc ladcore.ObjectEncoder) error
 //
 //	var requests []Request = ...
-//	logger.Info("sending requests", lad.ObjectValues("requests", requests))
+//	logger.Info("sending requests", zap.ObjectValues("requests", requests))
 //
 // If instead, you have a slice of pointers of such an object, use the Objects
 // field constructor.
 //
 //	var requests []*Request = ...
-//	logger.Info("sending requests", lad.Objects("requests", requests))
+//	logger.Info("sending requests", zap.Objects("requests", requests))
 func ObjectValues[T any, P ObjectMarshalerPtr[T]](key string, values []T) Field {
 	return Array(key, objectValues[T, P](values))
 }
@@ -208,7 +208,7 @@ func Strings(key string, ss []string) Field {
 //	func (a Request) String() string
 //
 //	var requests []Request = ...
-//	logger.Info("sending requests", lad.Stringers("requests", requests))
+//	logger.Info("sending requests", zap.Stringers("requests", requests))
 //
 // Note that these objects must implement fmt.Stringer directly.
 // That is, if you're trying to marshal a []Request, the String method

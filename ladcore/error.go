@@ -86,7 +86,7 @@ type errorGroup interface {
 
 // Note that errArray and errArrayElem are very similar to the version
 // implemented in the top-level error.go file. We can't re-use this because
-// that would require exporting errArray as part of the zapcore API.
+// that would require exporting errArray as part of the ladcore API.
 
 // Encodes a list of errors using the standard error encoding logic.
 type errArray []error

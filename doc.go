@@ -42,7 +42,7 @@
 // accept strongly typed fields - see the SugaredLogger.With documentation for
 // details.)
 //
-//	sugar := lad.NewExample().Sugar()
+//	sugar := zap.NewExample().Sugar()
 //	defer sugar.Sync()
 //	sugar.Infow("failed to fetch URL",
 //	  "url", "http://example.com",
@@ -59,19 +59,19 @@
 // use the Logger. It's even faster than the SugaredLogger and allocates far
 // less, but it only supports strongly-typed, structured logging.
 //
-//	logger := lad.NewExample()
+//	logger := zap.NewExample()
 //	defer logger.Sync()
 //	logger.Info("failed to fetch URL",
-//	  lad.String("url", "http://example.com"),
-//	  lad.Int("attempt", 3),
-//	  lad.Duration("backoff", time.Second),
+//	  zap.String("url", "http://example.com"),
+//	  zap.Int("attempt", 3),
+//	  zap.Duration("backoff", time.Second),
 //	)
 //
 // Choosing between the Logger and SugaredLogger doesn't need to be an
 // application-wide decision: converting between the two is simple and
 // inexpensive.
 //
-//	logger := lad.NewExample()
+//	logger := zap.NewExample()
 //	defer logger.Sync()
 //	sugar := logger.Sugar()
 //	plain := sugar.Desugar()
@@ -82,7 +82,7 @@
 // NewExample, NewProduction, and NewDevelopment. These presets build a logger
 // with a single function call:
 //
-//	logger, err := lad.NewProduction()
+//	logger, err := zap.NewProduction()
 //	if err != nil {
 //	  log.Fatalf("can't initialize zap logger: %v", err)
 //	}
@@ -105,10 +105,10 @@
 // BSON), a new log sink (e.g., Kafka), or something more exotic (perhaps an
 // exception aggregation service, like Sentry or Rollbar) typically requires
 // implementing the ladcore.Encoder, ladcore.WriteSyncer, or ladcore.Core
-// interfaces. See the zapcore documentation for details.
+// interfaces. See the ladcore documentation for details.
 //
 // Similarly, package authors can use the high-performance Encoder and Core
-// implementations in the zapcore package to build their own loggers.
+// implementations in the ladcore package to build their own loggers.
 //
 // # Frequently Asked Questions
 //

@@ -21,9 +21,11 @@
 package lad
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/tnngo/lad/ladcore"
+
 	"go.uber.org/multierr"
 )
 
@@ -472,4 +474,8 @@ func (ps invalidPairs) MarshalLogArray(enc ladcore.ArrayEncoder) error {
 		err = multierr.Append(err, enc.AppendObject(ps[i]))
 	}
 	return err
+}
+
+func (s *SugaredLogger) WithContext(ctx context.Context) *SugaredLogger {
+	return &SugaredLogger{base: s.base.With(s.base.contextFunc(ctx)...)}
 }

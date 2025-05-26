@@ -26,7 +26,6 @@ import (
 	"testing"
 	"time"
 
-	//revive:disable:dot-imports
 	. "github.com/tnngo/lad/ladcore"
 )
 

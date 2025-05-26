@@ -25,8 +25,9 @@ import (
 	"io"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/tnngo/lad/ladcore"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type flagTestCase struct {

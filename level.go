@@ -21,10 +21,9 @@
 package lad
 
 import (
-	"sync/atomic"
-
 	"github.com/tnngo/lad/internal"
 	"github.com/tnngo/lad/ladcore"
+	"go.uber.org/atomic"
 )
 
 const (

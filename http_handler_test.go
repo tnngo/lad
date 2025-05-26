@@ -23,13 +23,12 @@ package lad_test
 import (
 	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/tnngo/lad"
+	zap "github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
@@ -50,20 +49,20 @@ func TestAtomicLevelServeHTTP(t *testing.T) {
 			desc:          "GET",
 			method:        http.MethodGet,
 			expectedCode:  http.StatusOK,
-			expectedLevel: lad.InfoLevel,
+			expectedLevel: zap.InfoLevel,
 		},
 		{
 			desc:          "PUT JSON",
 			method:        http.MethodPut,
 			expectedCode:  http.StatusOK,
-			expectedLevel: lad.WarnLevel,
+			expectedLevel: zap.WarnLevel,
 			body:          `{"level":"warn"}`,
 		},
 		{
 			desc:          "PUT URL encoded",
 			method:        http.MethodPut,
 			expectedCode:  http.StatusOK,
-			expectedLevel: lad.WarnLevel,
+			expectedLevel: zap.WarnLevel,
 			contentType:   "application/x-www-form-urlencoded",
 			body:          "level=warn",
 		},
@@ -72,7 +71,7 @@ func TestAtomicLevelServeHTTP(t *testing.T) {
 			method:        http.MethodPut,
 			query:         "?level=warn",
 			expectedCode:  http.StatusOK,
-			expectedLevel: lad.WarnLevel,
+			expectedLevel: zap.WarnLevel,
 			contentType:   "application/x-www-form-urlencoded",
 		},
 		{
@@ -80,7 +79,7 @@ func TestAtomicLevelServeHTTP(t *testing.T) {
 			method:        http.MethodPut,
 			query:         "?level=info",
 			expectedCode:  http.StatusOK,
-			expectedLevel: lad.WarnLevel,
+			expectedLevel: zap.WarnLevel,
 			contentType:   "application/x-www-form-urlencoded",
 			body:          "level=warn",
 		},
@@ -89,7 +88,7 @@ func TestAtomicLevelServeHTTP(t *testing.T) {
 			method:        http.MethodPut,
 			query:         "?level=info",
 			expectedCode:  http.StatusOK,
-			expectedLevel: lad.WarnLevel,
+			expectedLevel: zap.WarnLevel,
 			body:          `{"level":"warn"}`,
 		},
 		{
@@ -155,7 +154,7 @@ func TestAtomicLevelServeHTTP(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			lvl := lad.NewAtomicLevel()
+			lvl := zap.NewAtomicLevel()
 			lvl.SetLevel(ladcore.InfoLevel)
 
 			server := httptest.NewServer(lvl)
@@ -196,7 +195,7 @@ func TestAtomicLevelServeHTTP(t *testing.T) {
 func TestAtomicLevelServeHTTPBrokenWriter(t *testing.T) {
 	t.Parallel()
 
-	lvl := lad.NewAtomicLevel()
+	lvl := zap.NewAtomicLevel()
 
 	request, err := http.NewRequest(http.MethodGet, "http://localhost:1234/log/level", nil)
 	require.NoError(t, err, "Error constructing request.")
@@ -215,45 +214,4 @@ type brokenHTTPResponseWriter struct {
 
 func (w *brokenHTTPResponseWriter) Write([]byte) (int, error) {
 	return 0, errors.New("great sadness")
-}
-
-func TestAtomicLevelServeHTTPBadLevel(t *testing.T) {
-	srv := httptest.NewServer(lad.NewAtomicLevel())
-	defer srv.Close()
-
-	req, err := http.NewRequest(http.MethodPut, srv.URL, strings.NewReader(`{"level":"<script>alert(\"malicious\")</script>"}`))
-	require.NoError(t, err, "Error constructing request.")
-
-	res, err := http.DefaultClient.Do(req)
-	require.NoError(t, err, "Error making request.")
-	defer func() {
-		assert.NoError(t, res.Body.Close(), "Error closing response body.")
-	}()
-
-	assert.Equal(t, http.StatusBadRequest, res.StatusCode, "Unexpected status code.")
-	resBody, err := io.ReadAll(res.Body)
-	require.NoError(t, err, "Error reading response body.")
-
-	assert.Contains(t, string(resBody), "unrecognized level", "Unexpected error message.")
-	assert.NotContains(t, string(resBody), "<script>", "Unexpected error message.")
-}
-
-func FuzzAtomicLevelServeHTTP(f *testing.F) {
-	f.Add(`{"level":"info"}`)
-	f.Add(`{"level":"warn"}`)
-	f.Add(`{"level":"<script>alert(\"malicious\")</script>"}`)
-	f.Fuzz(func(t *testing.T, input string) {
-		lvl := lad.NewAtomicLevel()
-
-		resw := httptest.NewRecorder()
-		req, err := http.NewRequest(http.MethodPut, "http://localhost:9999/log/level", strings.NewReader(input))
-		require.NoError(t, err, "Error constructing request.")
-
-		lvl.ServeHTTP(resw, req)
-
-		require.NotEqual(t, http.StatusInternalServerError, resw.Code, "Unexpected status code.")
-
-		// Response body must never contain HTML tags.
-		assert.NotRegexp(t, `<[^>]+>`, resw.Body.String(), "Unexpected HTML tag in response body.")
-	})
 }

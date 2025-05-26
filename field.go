@@ -417,7 +417,7 @@ func Dict(key string, val ...Field) Field {
 	return dictField(key, val)
 }
 
-// We need a function with the signature (string, T) for lad.Any.
+// We need a function with the signature (string, T) for zap.Any.
 func dictField(key string, val []Field) Field {
 	return Object(key, dictObject(val))
 }
@@ -431,18 +431,11 @@ func (d dictObject) MarshalLogObject(enc ladcore.ObjectEncoder) error {
 	return nil
 }
 
-// DictObject constructs a [ladcore.ObjectMarshaler] with the given list of fields.
-// The resulting object marshaler can be used as input to [Object], [Objects], or
-// any other functions that expect an object marshaler.
-func DictObject(val ...Field) ladcore.ObjectMarshaler {
-	return dictObject(val)
-}
-
-// We discovered an issue where lad.Any can cause a performance degradation
+// We discovered an issue where zap.Any can cause a performance degradation
 // when used in new goroutines.
 //
-// This happens because the compiler assigns 4.8kb (one lad.Field per arm of
-// switch statement) of stack space for lad.Any when it takes the form:
+// This happens because the compiler assigns 4.8kb (one zap.Field per arm of
+// switch statement) of stack space for zap.Any when it takes the form:
 //
 //	switch v := v.(type) {
 //	case string:

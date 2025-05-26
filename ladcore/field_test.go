@@ -30,10 +30,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tnngo/lad"
-
-	//revive:disable:dot-imports
+	zap "github.com/tnngo/lad"
 	. "github.com/tnngo/lad/ladcore"
+	//revive:disable:dot-imports
 )
 
 type users int
@@ -113,7 +112,7 @@ func TestFieldAddingError(t *testing.T) {
 		{t: ArrayMarshalerType, iface: users(-1), want: []interface{}{}, err: "too few users"},
 		{t: ObjectMarshalerType, iface: users(-1), want: map[string]interface{}{}, err: "too few users"},
 		{t: InlineMarshalerType, iface: users(-1), want: nil, err: "too few users"},
-		{t: StringerType, iface: obj{}, want: empty, err: "PANIC=interface conversion: zapcore_test.obj is not fmt.Stringer: missing method String"},
+		{t: StringerType, iface: obj{}, want: empty, err: "PANIC=interface conversion: ladcore_test.obj is not fmt.Stringer: missing method String"},
 		{t: StringerType, iface: &obj{1}, want: empty, err: "PANIC=panic with string"},
 		{t: StringerType, iface: &obj{2}, want: empty, err: "PANIC=panic with error"},
 		{t: StringerType, iface: &obj{3}, want: empty, err: "PANIC=<nil>"},
@@ -216,118 +215,108 @@ func TestEquals(t *testing.T) {
 		want bool
 	}{
 		{
-			a:    lad.Int16("a", 1),
-			b:    lad.Int32("a", 1),
+			a:    zap.Int16("a", 1),
+			b:    zap.Int32("a", 1),
 			want: false,
 		},
 		{
-			a:    lad.String("k", "a"),
-			b:    lad.String("k", "a"),
+			a:    zap.String("k", "a"),
+			b:    zap.String("k", "a"),
 			want: true,
 		},
 		{
-			a:    lad.String("k", "a"),
-			b:    lad.String("k2", "a"),
+			a:    zap.String("k", "a"),
+			b:    zap.String("k2", "a"),
 			want: false,
 		},
 		{
-			a:    lad.String("k", "a"),
-			b:    lad.String("k", "b"),
+			a:    zap.String("k", "a"),
+			b:    zap.String("k", "b"),
 			want: false,
 		},
 		{
-			a:    lad.Time("k", time.Unix(1000, 1000)),
-			b:    lad.Time("k", time.Unix(1000, 1000)),
+			a:    zap.Time("k", time.Unix(1000, 1000)),
+			b:    zap.Time("k", time.Unix(1000, 1000)),
 			want: true,
 		},
 		{
-			a:    lad.Time("k", time.Unix(1000, 1000).In(time.UTC)),
-			b:    lad.Time("k", time.Unix(1000, 1000).In(time.FixedZone("TEST", -8))),
+			a:    zap.Time("k", time.Unix(1000, 1000).In(time.UTC)),
+			b:    zap.Time("k", time.Unix(1000, 1000).In(time.FixedZone("TEST", -8))),
 			want: false,
 		},
 		{
-			a:    lad.Time("k", timeOutOfRangeLow),
-			b:    lad.Time("k", timeOutOfRangeLowNano),
+			a:    zap.Time("k", timeOutOfRangeLow),
+			b:    zap.Time("k", timeOutOfRangeLowNano),
 			want: false,
 		},
 		{
-			a:    lad.Time("k", timeOutOfRangeHigh),
-			b:    lad.Time("k", timeOutOfRangeHighNano),
+			a:    zap.Time("k", timeOutOfRangeHigh),
+			b:    zap.Time("k", timeOutOfRangeHighNano),
 			want: false,
 		},
 		{
-			a:    lad.Time("k", time.Unix(1000, 1000)),
-			b:    lad.Time("k", time.Unix(1000, 2000)),
+			a:    zap.Time("k", time.Unix(1000, 1000)),
+			b:    zap.Time("k", time.Unix(1000, 2000)),
 			want: false,
 		},
 		{
-			a:    lad.Binary("k", []byte{1, 2}),
-			b:    lad.Binary("k", []byte{1, 2}),
+			a:    zap.Binary("k", []byte{1, 2}),
+			b:    zap.Binary("k", []byte{1, 2}),
 			want: true,
 		},
 		{
-			a:    lad.Binary("k", []byte{1, 2}),
-			b:    lad.Binary("k", []byte{1, 3}),
+			a:    zap.Binary("k", []byte{1, 2}),
+			b:    zap.Binary("k", []byte{1, 3}),
 			want: false,
 		},
 		{
-			a:    lad.ByteString("k", []byte("abc")),
-			b:    lad.ByteString("k", []byte("abc")),
+			a:    zap.ByteString("k", []byte("abc")),
+			b:    zap.ByteString("k", []byte("abc")),
 			want: true,
 		},
 		{
-			a:    lad.ByteString("k", []byte("abc")),
-			b:    lad.ByteString("k", []byte("abd")),
+			a:    zap.ByteString("k", []byte("abc")),
+			b:    zap.ByteString("k", []byte("abd")),
 			want: false,
 		},
 		{
-			a:    lad.Ints("k", []int{1, 2}),
-			b:    lad.Ints("k", []int{1, 2}),
+			a:    zap.Ints("k", []int{1, 2}),
+			b:    zap.Ints("k", []int{1, 2}),
 			want: true,
 		},
 		{
-			a:    lad.Ints("k", []int{1, 2}),
-			b:    lad.Ints("k", []int{1, 3}),
+			a:    zap.Ints("k", []int{1, 2}),
+			b:    zap.Ints("k", []int{1, 3}),
 			want: false,
 		},
 		{
-			a:    lad.Object("k", users(10)),
-			b:    lad.Object("k", users(10)),
+			a:    zap.Object("k", users(10)),
+			b:    zap.Object("k", users(10)),
 			want: true,
 		},
 		{
-			a:    lad.Object("k", users(10)),
-			b:    lad.Object("k", users(20)),
+			a:    zap.Object("k", users(10)),
+			b:    zap.Object("k", users(20)),
 			want: false,
 		},
 		{
-			a:    lad.Any("k", map[string]string{"a": "b"}),
-			b:    lad.Any("k", map[string]string{"a": "b"}),
+			a:    zap.Any("k", map[string]string{"a": "b"}),
+			b:    zap.Any("k", map[string]string{"a": "b"}),
 			want: true,
 		},
 		{
-			a:    lad.Any("k", map[string]string{"a": "b"}),
-			b:    lad.Any("k", map[string]string{"a": "d"}),
+			a:    zap.Any("k", map[string]string{"a": "b"}),
+			b:    zap.Any("k", map[string]string{"a": "d"}),
 			want: false,
 		},
 		{
-			a:    lad.Dict("k", lad.String("a", "b")),
-			b:    lad.Dict("k", lad.String("a", "b")),
+			a:    zap.Dict("k", zap.String("a", "b")),
+			b:    zap.Dict("k", zap.String("a", "b")),
 			want: true,
 		},
 		{
-			a:    lad.Dict("k", lad.String("a", "b")),
-			b:    lad.Dict("k", lad.String("a", "d")),
-			want: false,
-		},
-		{
-			a:    lad.Object("k", lad.DictObject(lad.String("a", "b"))),
-			b:    lad.Object("k", lad.DictObject(lad.String("a", "b"))),
-			want: true,
-		},
-		{
-			a:    lad.Object("k", lad.DictObject(lad.String("a", "b"))),
-			b:    lad.Object("k", lad.DictObject(lad.String("a", "d"))),
+			a:    zap.Dict("k", zap.String("a", "b")),
+			b:    zap.Dict("k", zap.String("a", "d")),
 			want: false,
 		},
 	}

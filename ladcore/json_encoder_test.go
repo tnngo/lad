@@ -26,15 +26,15 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tnngo/lad/ladcore"
 
 	"github.com/tnngo/lad"
+	"github.com/tnngo/lad/ladcore"
 )
 
 // TestJSONEncodeEntry is an more "integrated" test that makes it easier to get
 // coverage on the json encoder (e.g. putJSONEncoder, let alone EncodeEntry
 // itself) than the tests in json_encoder_impl_test.go; it needs to be in the
-// zapcore_test package, so that it can import the toplevel zap package for
+// ladcore_test package, so that it can import the toplevel lad package for
 // field constructor convenience.
 func TestJSONEncodeEntry(t *testing.T) {
 	type bar struct {

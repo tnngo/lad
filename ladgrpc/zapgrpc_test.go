@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/tnngo/lad"
+	zap "github.com/tnngo/lad"
 	"github.com/tnngo/lad/ladcore"
 	"github.com/tnngo/lad/ladtest/observer"
 
@@ -259,5 +259,5 @@ func withLogger(
 	f func(*Logger, *observer.ObservedLogs),
 ) {
 	core, observedLogs := observer.New(enab)
-	f(NewLogger(lad.New(core), append(opts, withWarn())...), observedLogs)
+	f(NewLogger(zap.New(core), append(opts, withWarn())...), observedLogs)
 }

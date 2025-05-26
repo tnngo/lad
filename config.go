@@ -50,7 +50,7 @@ type SamplingConfig struct {
 // Note that Config intentionally supports only the most common options. More
 // unusual logging setups (logging to network connections or message queues,
 // splitting output between multiple files, etc.) are possible, but require
-// direct use of the zapcore package. For sample code, see the package-level
+// direct use of the ladcore package. For sample code, see the package-level
 // BasicConfiguration and AdvancedConfiguration examples.
 //
 // For an example showing runtime log level changes, see the documentation for

@@ -135,11 +135,11 @@ w := ladcore.AddSync(&lumberjack.Logger{
   MaxAge:     28, // days
 })
 core := ladcore.NewCore(
-  ladcore.NewJSONEncoder(lad.NewProductionEncoderConfig()),
+  ladcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
   w,
-  lad.InfoLevel,
+  zap.InfoLevel,
 )
-logger := lad.New(core)
+logger := zap.New(core)
 ```
 
 ## Extensions

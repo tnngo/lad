@@ -22,8 +22,8 @@ package observer
 
 import "github.com/tnngo/lad/ladcore"
 
-// A LoggedEntry is an encoding-agnostic representation of a log message.
-// Field availability is context dependent.
+// An LoggedEntry is an encoding-agnostic representation of a log message.
+// Field availability is context dependant.
 type LoggedEntry struct {
 	ladcore.Entry
 	Context []ladcore.Field

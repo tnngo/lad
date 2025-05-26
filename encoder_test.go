@@ -23,8 +23,9 @@ package lad
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/tnngo/lad/ladcore"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRegisterDefaultEncoders(t *testing.T) {

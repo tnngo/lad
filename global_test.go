@@ -29,9 +29,9 @@ import (
 
 	"github.com/tnngo/lad/internal/exit"
 	"github.com/tnngo/lad/internal/ztest"
-	"github.com/tnngo/lad/ladcore"
-
 	"github.com/tnngo/lad/ladtest/observer"
+
+	"github.com/tnngo/lad/ladcore"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

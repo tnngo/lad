@@ -26,9 +26,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/tnngo/lad/ladcore"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tnngo/lad/ladcore"
 )
 
 func BenchmarkBoolsArrayMarshaler(b *testing.B) {
