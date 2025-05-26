@@ -21,4 +21,4 @@
 // package ladcore defines and implements the low-level interfaces upon which
 // zap is built. By providing alternate implementations of these interfaces,
 // external packages can extend zap's capabilities.
-package ladcore // import "go.uber.org/zap/zapcore"
+package ladcore // import "github.com/tnngo/lad/zapcore"
